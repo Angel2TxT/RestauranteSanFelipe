@@ -52,18 +52,18 @@
                   <div class="footer-modern-contacts wow slideInUp">
                     <div class="unit unit-spacing-sm align-items-center">
                       <div class="unit-left"><span class="icon icon-24 mdi mdi-phone"></span></div>
-                      <div class="unit-body"><a class="phone" href="tel:#">+52 961-172-4435</a></div>
+                      <div class="unit-body"><a class="phone" href="tel:9611724435">+52 961-172-4435</a></div>
                     </div>
                   </div>
                   <div class="footer-modern-contacts wow slideInDown">
                     <div class="unit unit-spacing-sm align-items-center">
                       <div class="unit-left"><span class="icon mdi mdi-email"></span></div>
-                      <div class="unit-body"><a class="mail" href="mailto:#">lopeztrujilloxd@gmail.com</a></div>
+                      <div class="unit-body"><a class="mail" href="mailto:#"></a></div>
                     </div>
                   </div>
                   <div class="wow slideInRight">
                     <ul class="list-inline footer-social-list footer-social-list-2 footer-social-list-3">
-                      <li><a class="icon mdi mdi-facebook" href="#"></a></li>
+                      <li><a class="icon mdi mdi-facebook" href="https://web.facebook.com/hospedajesanfelipedejesus"></a></li>
                       <li><a class="icon mdi mdi-twitter" href="#"></a></li>
                       <li><a class="icon mdi mdi-instagram" href="#"></a></li>
                       <li><a class="icon mdi mdi-google-plus" href="#"></a></li>

@@ -18,9 +18,9 @@
             </a>
         </div>
       </div>
-      @if ($product->label)
+      @if ($product->category->name)
       <span class="product-badge product-badge-new">
-        {{$product->label}}
+        {{$product->category->name}}
       </span>
       @endif
 

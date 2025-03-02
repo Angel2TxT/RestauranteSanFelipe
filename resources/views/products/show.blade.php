@@ -2,6 +2,8 @@
 
 @section('content')
 
+
+
 <section class="bg-gray-7">
     <div class="breadcrumbs-custom box-transform-wrap context-dark">
       <div class="container">
@@ -36,7 +38,7 @@
                 <p class="card-text">
                     {{$product->description}}
                 </p>
-                <a href="#" class="btn btn-primary mt-4">Agregar al carrito</a>
+                <a href="{{route('cart.add',$product)}}" class="btn btn-primary mt-4">Agregar al carrito</a>
               </div>
             </div>
           </div>

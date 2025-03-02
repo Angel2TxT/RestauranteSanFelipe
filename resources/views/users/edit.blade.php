@@ -4,7 +4,7 @@
     <div class="row col-md-8 offset-md-2">
         <div class="card shadow">
             <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                <h3 class="m-0 font-weight-bold text-primary"> Edit User</h3>
+                <h3 class="m-0 font-weight-bold text-primary"> Editar Usuario</h3>
                 <a href="" class="btn btn-primary">Volver</a>
             </div>
             <div class="card-body">
@@ -14,12 +14,12 @@
                     @method('PATCH')
 
                     <div class="form-group col-md-6">
-                        <label for="name">Name*</label>
+                        <label for="name">Nombre*</label>
                         <input class="form-control" id="name" type="name" value="{{ $user->name }}" name="name">
                     </div>
 
                     <div class="form-group col-md-6">
-                        <label for="last_name">Last name</label>
+                        <label for="last_name">Apellido</label>
                         <input class="form-control" id="last_name" type="text" value="{{ $user->last_name }}" name="last_name">
                     </div>
 
@@ -28,22 +28,22 @@
                         <input class="form-control" id="email" type="email" value="{{ $user->email }}" name="email">
                     </div>
                     <div class="form-group col-md-6">
-                        <label for="address">Address</label>
+                        <label for="address">Direccion</label>
                         <input class="form-control" id="address" type="text" value="{{ $user->address }}" name="address">
                     </div>
 
                     <div class="form-group col-md-6">
-                        <label for="password">Password*</label>
+                        <label for="password">Contraseña*</label>
                         <input class="form-control" id="password" type="password" name="password">
                     </div>
 
                     <div class="form-group col-md-6">
-                        <label for="password_confirmation">Confirm Password*</label>
+                        <label for="password_confirmation">Confirmar contraseña*</label>
                         <input class="form-control" id="password_confirmation" type="password" name="password_confirmation">
                     </div>
                     <div class="form-group col-md-6">
 
-                        <label for="phone">Phone</label>
+                        <label for="phone">Numero</label>
                         <input class="form-control" id="phone" type="text" value="{{ $user->phone }}" name="phone">
 
                     </div>

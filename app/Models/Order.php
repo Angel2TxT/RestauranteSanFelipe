@@ -9,11 +9,25 @@ class Order extends Model
 {
     use HasFactory;
 
-    public function items(){
-        return $this->belongsToMany(Item::class)->withPivot(['qty','fecha']);
+    protected $fillable = ['total', 'notes', 'status', 'fecha', 'user_id', 'order_type', 'address', 'table_id'];
+
+
+    public function items()
+    {
+        return $this->belongsToMany(Item::class, 'item_order')
+                    ->withPivot(['qty', 'fecha']);
+    }
+    
+
+
+        public function table()
+    {
+        return $this->belongsTo(Table::class);
     }
 
-    public function user(){
+
+    public function user()
+    {
         return $this->belongsTo(User::class);
     }
 }

@@ -20,7 +20,7 @@
                             <th scope="col">Nombre</th>
                             <th scope="col">Descripcion</th>
                             <th scope="col">Precio</th>
-                            <th scope="col">Label</th>
+                            
                             <th scope="col">Categoria</th>
                             <th scope="col">...</th>
                             <th scope="col">...</th>
@@ -37,7 +37,7 @@
                             <td>{{$product->name}}</td>
                             <td>{{$product->description}}</td>
                             <td>${{$product->price}}</td>
-                            <td>{{$product->label}}</td>
+                            
                             <td>{{$product->category->name}}</td>
 
                             <td>

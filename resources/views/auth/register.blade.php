@@ -15,14 +15,19 @@
                             <div class="row row-20 gutters-20">
 
                                 <div class="col-md-6">
-
                                     <div class="form-wrap">
                                         <label class="form-label" for="name">Nombre*</label>
                                         <input class="form-input" id="name" type="text" value="{{ old('name') }}"
-                                            id="name" name="name">
-
+                                            name="name">
                                     </div>
+                                </div>
 
+                                <div class="col-md-6">
+                                    <div class="form-wrap">
+                                        <label for="last_name" class="form-label">Apellido*</label>
+                                        <input id="last_name" type="text" class="form-input" name="last_name"
+                                            value="{{ old('last_name') }}">
+                                    </div>
                                 </div>
 
                                 <div class="col-md-6">
@@ -35,22 +40,37 @@
 
                                 <div class="col-md-6">
                                     <div class="form-wrap">
+                                        <label for="address" class="form-label">Dirección*</label>
+                                        <input id="address" type="text" class="form-input" name="address"
+                                            value="{{ old('address') }}">
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="form-wrap">
                                         <label for="password" class="form-label">Contraseña</label>
-
                                         <input id="password" type="password" class="form-input" name="password">
-
                                     </div>
                                 </div>
 
                                 <div class="col-md-6">
                                     <div class="form-wrap">
                                         <label for="password-confirm" class="form-label">Confirma contraseña</label>
-
-
                                         <input id="password-confirm" type="password" class="form-input"
                                             name="password_confirmation">
                                     </div>
                                 </div>
+
+
+                                <div class="col-md-6">
+                                    <div class="form-wrap">
+                                        <label for="phone" class="form-label">Teléfono*</label>
+                                        <input id="phone" type="text" class="form-input" name="phone"
+                                            value="{{ old('phone') }}">
+                                    </div>
+                                </div>
+
+
 
                             </div>
 

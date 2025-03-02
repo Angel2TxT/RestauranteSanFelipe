@@ -47,8 +47,18 @@
                 <td>${{$order->total}}</td>
                 <td>{{$order->fecha}}</td>
                 <td>
-                  <span class="@if($order->status=='Pending') badge-danger @else badge-success @endif">
-                    {{$order->status}}
+                  <span class="d-block text-center @if ($order->status == 'pending') badge-danger @else badge-success @endif" style="padding: 10px; border-radius: 15px;">
+
+                    @if ($order->status == 'pending') 
+                    Orden pendiente 
+                  @elseif ($order->status == 'in_progress')
+                    Orden en proceso
+                  @elseif ($order->status == 'ready_for_delivery')
+                    Enviado
+                    @elseif ($order->status == 'completed')
+                    Completado
+                  @endif
+    
                   </span>
                 </td>
 

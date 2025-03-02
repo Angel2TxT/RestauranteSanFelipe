@@ -7,16 +7,32 @@
     <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
         <h3 class="m-0 font-weight-bold text-primary">
             Order#{{$order->id}}
-            <span class="badge badge-pill @if($order->status=='Pending')badge-danger @else badge-success @endif">
-                {{$order->status}}
+            <span class="  @if ($order->status == 'pending') badge-danger @else badge-success @endif" style=" padding: 5px; border-radius: 5px; ">
+                @if ($order->status == 'pending') 
+                    Orden pendiente 
+                @elseif ($order->status == 'in_progress')
+                    Orden en proceso
+                @elseif ($order->status == 'ready_for_delivery')
+                    Enviado
+                @elseif ($order->status == 'completed')
+                    Completado
+                @endif
             </span>
         </h3>
 
         <div class="d-flex flex-row align-items-end">
             <a href="{{route('orders.index')}}" class="btn btn-primary mr-2">Regresar</a>
 
-            <a href="{{route('orders.status',$order)}}" class="btn btn-success">
-                Terminar pedido
+            <a href="{{ route('orders.status', $order) }}" class="btn btn-success">
+                @if ($order->status == 'pending')
+                    Comenzar pedido
+                @elseif ($order->status == 'in_progress')
+                    terminar pedido
+                @elseif ($order->status == 'ready_for_delivery')
+                    Listo para entrega
+                    @elseif ($order->status == 'completed')
+                    Completado
+                @endif
             </a>
 
         </div>

@@ -14,7 +14,7 @@ class UserController extends Controller
     public function index()
     {
         $users = User::orderBy('id','desc')->paginate(3);
-        return view('users.index',compact('users'));
+        return view('users.index', compact('users'));
     }
 
     /**
@@ -30,10 +30,9 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
-
-        $this->validate($request,[
-            'name'=>'required|max:255',
-            'email'=>'required|email|max:255',
+        $this->validate($request, [
+            'name' => 'required|max:255',
+            'email' => 'required|email|max:255',
             'password' => 'required|string|min:8|confirmed|max:255',
             'image' => 'image|mimes:jpeg,png|max:1024|nullable'
         ]);
@@ -46,32 +45,24 @@ class UserController extends Controller
         $user->phone = $request->get('phone');
         $user->password = Hash::make($request->get('password'));
 
-        $user->admin = $request->get('admin') =='on' ? 1 : 0;
+        // Asignar admin o cliente
+        $user->admin = $request->get('admin') == 'on' ? 1 : 0;
 
-
-        // Imagen
-        if ($request->hasFile("image")) {
-
-            $imagen = $request->file("image");
-            $nombreImagen='images/users/'.uniqid().'.'.$imagen->guessExtension();
-            $ruta=public_path('images/users/');
-            $imagen->move($ruta,$nombreImagen);
-            $user->image=$nombreImagen;
+        // Imagen predeterminada para clientes si no sube una imagen
+        if ($user->admin == 0 && !$request->hasFile('image')) {
+            $user->image = 'images/no-image.png';  // Imagen predeterminada
+        } elseif ($request->hasFile('image')) {
+            // Subir imagen si es empleado/admin
+            $imagen = $request->file('image');
+            $nombreImagen = 'images/users/' . uniqid() . '.' . $imagen->guessExtension();
+            $ruta = public_path('images/users/');
+            $imagen->move($ruta, $nombreImagen);
+            $user->image = $nombreImagen;
         }
 
         $user->save();
 
-        return redirect()->route('users.index')->with(['msg'=>'User created.']);
-
-
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
+        return redirect()->route('users.index')->with(['msg' => 'User created.']);
     }
 
     /**
@@ -80,7 +71,7 @@ class UserController extends Controller
     public function edit(string $id)
     {
         $user = User::findOrFail($id);
-        return view('users.edit',compact('user'));
+        return view('users.edit', compact('user'));
     }
 
     /**
@@ -88,9 +79,9 @@ class UserController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $this->validate($request,[
-            'name'=>'required',
-            'email'=>'required|email',
+        $this->validate($request, [
+            'name' => 'required',
+            'email' => 'required|email',
             'password' => 'nullable|string|min:8|confirmed',
             'image' => 'image|mimes:jpeg,png|max:1024|nullable'
         ]);
@@ -102,33 +93,33 @@ class UserController extends Controller
         $user->address = $request->get('address');
         $user->phone = $request->get('phone');
 
-        if($request->get('password')){
+        if ($request->get('password')) {
             $user->password = Hash::make($request->get('password'));
-
         }
 
-        $user->admin = $request->get('admin') =='on' ? 1 : 0;
+        $user->admin = $request->get('admin') == 'on' ? 1 : 0;
 
-        // Imagen
-        if ($request->hasFile("image")) {
-
-            $path = public_path().'/'.$user->image;
-
-            if (file_exists($path) && $user->image!=null){
+        // Imagen predeterminada para clientes si no sube una imagen
+        if ($user->admin == 0 && !$request->hasFile('image')) {
+            $user->image = 'images/no-image.png';  // Imagen predeterminada
+        } elseif ($request->hasFile('image')) {
+            // Eliminar la imagen antigua
+            $path = public_path() . '/' . $user->image;
+            if (file_exists($path) && $user->image != null) {
                 unlink($path);
             }
 
-            $imagen = $request->file("image");
-            $nombreImagen='images/users/'.uniqid().'.'.$imagen->guessExtension();
-            $ruta=public_path('images/users/');
-            $imagen->move($ruta,$nombreImagen);
-            $user->image=$nombreImagen;
+            // Subir la nueva imagen
+            $imagen = $request->file('image');
+            $nombreImagen = 'images/users/' . uniqid() . '.' . $imagen->guessExtension();
+            $ruta = public_path('images/users/');
+            $imagen->move($ruta, $nombreImagen);
+            $user->image = $nombreImagen;
         }
 
         $user->update();
 
-        return redirect()->route('users.index')->with(['msg'=>'User edit.']);
-
+        return redirect()->route('users.index')->with(['msg' => 'User updated.']);
     }
 
     /**
@@ -138,13 +129,12 @@ class UserController extends Controller
     {
         $user = User::findOrFail($id);
 
-        $path = public_path().'/'.$user->image;
-        if (file_exists($path) && $user->image!=null){
+        $path = public_path() . '/' . $user->image;
+        if (file_exists($path) && $user->image != null) {
             unlink($path);
         }
 
         $user->delete();
-        return redirect()->route('users.index')->with('msg','user delete.');
-
+        return redirect()->route('users.index')->with('msg', 'User deleted.');
     }
 }

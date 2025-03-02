@@ -49,12 +49,7 @@
                     </select>
 
                 </div>
-                <div class="form-group col-md-3">
-
-                    <label for="label">Etiqueta*</label>
-                    <input class="form-control" id="label" type="text" value="{{old('label')}}" name="label">
-
-                </div>
+                
 
                 <div class="col-12">
                     <div class="form-wrap">

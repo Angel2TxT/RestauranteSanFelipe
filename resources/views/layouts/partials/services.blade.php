@@ -6,7 +6,7 @@
             <div class="box-icon-megan-icon linearicons-bag"></div>
           </div>
           <h5 class="box-icon-megan-title"><a href="#">Envios gratis</a></h5>
-          <p class="box-icon-megan-text">a partir de 3 productos comprados en adelante.</p>
+          <p class="box-icon-megan-text">A partir de 3 productos comprados en adelante.</p>
         </article>
         <article class="box-icon-megan wow fadeInUp" data-wow-delay=".05s">
           <div class="box-icon-megan-header">
@@ -20,14 +20,14 @@
             <div class="box-icon-megan-icon linearicons-radar"></div>
           </div>
           <h5 class="box-icon-megan-title"><a href="#">Wi-Fi gratis</a></h5>
-          <p class="box-icon-megan-text">Internet gratis para consumidores en el restaurante.</p>
+          <p class="box-icon-megan-text">Exclusivo para clientes del restaurante.</p>
         </article>
         <article class="box-icon-megan wow fadeInUp" data-wow-delay=".15s">
           <div class="box-icon-megan-header">
             <div class="box-icon-megan-icon linearicons-thumbs-up"></div>
           </div>
           <h5 class="box-icon-megan-title"><a href="#">El mejor servicio</a></h5>
-          <p class="box-icon-megan-text">Nuestros clientes son de nuestra primera importancia.</p>
+          <p class="box-icon-megan-text">Para todos nuestros clientes que son de nuestra primera importancia.</p>
         </article>
       </div>
     </div>

@@ -50,12 +50,7 @@
                     </select>
 
                 </div>
-                <div class="form-group col-md-3">
-
-                    <label for="label">Tipo*</label>
-                    <input class="form-control" id="label" type="text" value="{{$product->label}}" name="label">
-
-                </div>
+                
 
                 <div class="col-6">
                     <img src="{{asset($product->image)}}" width="180">

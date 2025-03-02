@@ -7,67 +7,98 @@
     </div>
     <div class="card-body">
 
-        <table class="table text-center">
-            <thead>
-                <tr>
-                    <th scope="col">#</th>
-                    <th scope="col">Total</th>
-                    <th scope="col">Usuario</th>
-                    <th scope="col">Fecha</th>
-                    <th scope="col">Estatus</th>
-                    <th scope="col">...</th>
-                    <th scope="col">...</th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse ($orders as $order)
-                <tr>
-                    <th scope="row">{{$order->id}}</th>
-                    <td>${{$order->total}}</td>
-                    <td>{{$order->user->name}}</td>
-                    <td>{{$order->fecha}}</td>
-                    <td>
-                        <span class="@if($order->status=='Pending') badge badge-danger @else badge badge-success @endif" style="padding: 10px">
-                            {{$order->status}}
-                        </span>
-                    </td>
+        <div class="table-responsive"> <!-- Añadimos table-responsive aquí -->
+            <table class="table text-center">
+                <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Total</th>
+                        <th scope="col">Usuario</th>
+                        <th scope="col">Fecha</th>
+                        <th scope="col">Estatus</th>
+                        <th scope="col">Tipo</th>
+                        <th scope="col">Mesa</th>
+                        <th scope="col">...</th>
+                        <th scope="col">...</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse ($orders as $order)
+                    <tr>
+                        <th scope="row">{{$order->id}}</th>
+                        <td>${{$order->total}}</td>
+                        <td>{{$order->user->name}}</td>
+                        <td>{{$order->fecha}}</td>
+                        <td>
+                            <span class="d-block text-center @if ($order->status == 'pending') badge-danger @else badge-success @endif" style="padding: 10px; border-radius: 15px; ">
+                                @if ($order->status == 'pending') 
+                                    Orden pendiente 
+                                @elseif ($order->status == 'in_progress')
+                                    Orden en proceso
+                                @elseif ($order->status == 'ready_for_delivery')
+                                    Enviado
+                                @elseif ($order->status == 'completed')
+                                    Completado
+                                @endif
+                            </span>
+                        </td>
 
-                    <td>
-                        <a class="btn btn-primary btn-sm" href="{{route('orders.show',$order->id)}}">
-                            <span class="fas fa-eye"></span>
-                        </a>
-                    </td>
-                    <td>
+                        <td>
+                            <span class="d-block text-center @if ($order->order_type == 'pending') badge-danger @else badge-success @endif" style="padding: 10px; border-radius: 15px; ">
+                                @if ($order->order_type == 'dine_in') 
+                                    Local
+                                @elseif ($order->order_type == 'delivery')
+                                    Envio
+                                @elseif ($order->order_type == 'pickup')
+                                    Recoger
+                    
+                                @endif
+                            </span>
+                        </td>
 
-                        <form action="{{route('orders.destroy',$order->id)}}" method="POST" class="confirm-form mb-0">
-                            @csrf
-                            @method('DELETE')
+                        <td>
+                            <span class="d-block text-center @if ($order->order_type == 'pending') badge-danger @else badge-success @endif" style="padding: 10px; border-radius: 15px; ">
+                                @if ($order->order_type == 'dine_in') 
+                                    {{
+                                        $order->table->name
+                                    }}
+                                @else 
+                                    No aplica
+                               
+                    
+                                @endif
+                            </span>
+                        </td>
 
-                            <button type="submit" class="btn btn-danger btn-sm">
-                                <span class="fas fa-trash"></span>
-                            </button>
+                        <td>
+                            <a class="btn btn-primary btn-sm" href="{{route('orders.show',$order->id)}}">
+                                <span class="fas fa-eye"></span>
+                            </a>
+                        </td>
+                        <td>
+                            <form action="{{route('orders.destroy',$order->id)}}" method="POST" class="confirm-form mb-0">
+                                @csrf
+                                @method('DELETE')
 
-                        </form>
-                    </td>
-                </tr>
+                                <button type="submit" class="btn btn-danger btn-sm">
+                                    <span class="fas fa-trash"></span>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
 
-                @empty
+                    @empty
+                    <tr>
+                        <td colspan="10">Sin registros</td>
+                    </tr>
 
-                <tr>
-                    <td colspan="10">Sin registros</td>
-                </tr>
-
-                @endforelse
-
-
-            </tbody>
-        </table>
+                    @endforelse
+                </tbody>
+            </table>
+        </div> <!-- Cierra el div de table-responsive -->
     </div>
     <div class="card-footer">
-
         {{$orders->links()}}
-
-
     </div>
 </div>
 @endsection

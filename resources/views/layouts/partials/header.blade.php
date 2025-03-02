@@ -16,7 +16,7 @@
                             data-rd-navbar-toggle=".rd-navbar-nav-wrap"><span></span></button>
                         <!-- RD Navbar Brand-->
                         <div class="rd-navbar-brand"><a class="brand" href=""><img class="brand-logo-dark"
-                                    src="images/logoSFB.png" alt="" width="198" height="66" style="position: relative; left: -80px;" /></a>
+                                    src="images/logoSFB.png" alt="" width="198" height="66" style="position: relative; left: -10px;" /></a>
                         </div>
                     </div>
                     <div class="rd-navbar-right rd-navbar-nav-wrap">
@@ -46,20 +46,24 @@
                         <div class="rd-navbar-main">
                             <!-- RD Navbar Nav-->
                             <ul class="rd-navbar-nav">
-                                <li class="rd-nav-item active"><a class="rd-nav-link" href="{{route('home')}}">Inicio</a>
+                                <li class="rd-nav-item {{ Request::is('/') ? 'active' : '' }}">
+                                    <a class="rd-nav-link" href="{{ route('home') }}">Inicio</a>
                                 </li>
-                                <li class="rd-nav-item"><a class="rd-nav-link" href="{{route('shop')}}">Productos</a>
+                                <li class="rd-nav-item {{ Request::is('shop') ? 'active' : '' }}">
+                                    <a class="rd-nav-link" href="{{ route('shop') }}">Productos</a>
                                 </li>
+                                
 
                                 
 
                                 @guest
 
-                                    <li class="rd-nav-item"><a class="rd-nav-link" href="{{ route('login') }}">Login</a>
+                                    <li class="rd-nav-item {{ Request::is('login') ? 'active' : '' }}">
+                                        <a class="rd-nav-link" href="{{ route('login') }}">Login</a>
                                     </li>
 
-                                    <li class="rd-nav-item"><a class="rd-nav-link"
-                                            href="{{ route('register') }}">Registrarse</a>
+                                    <li class="rd-nav-item {{ Request::is('register') ? 'active' : '' }}">
+                                        <a class="rd-nav-link" href="{{ route('register') }}">Registrarse</a>
                                     </li>
                                 @else
                                     <li class="rd-nav-item">
@@ -99,7 +103,7 @@
                     <div class="rd-navbar-project-hamburger rd-navbar-project-hamburger-open rd-navbar-fixed-element-1"
                         data-multitoggle=".rd-navbar-inner" data-multitoggle-blur=".rd-navbar-wrap"
                         data-multitoggle-isolate="data-multitoggle-isolate">
-                        <span class="fas fa-shopping-cart" style="font-size: 1.3rem"><span style="font-size: 1rem">{{Cart::instance('shopping')->content()->count()}}</span></span>
+                        <span class="fas fa-shopping-cart" style="font-size: 1.3rem; margin-left: -50px;"><span style="font-size: 1rem">{{Cart::instance('shopping')->content()->count()}}</span></span>
 
                     </div>
                     <div class="rd-navbar-project">

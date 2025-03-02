@@ -15,10 +15,10 @@
 
 
       <!-- What We Offer-->
-        {{-- @include('layouts.partials.comments') --}}
+        {{-- @include('layouts.partials.comments')--}}
 
         {{-- Gallery --}}
-        @include('layouts.partials.gallery')
+       {{-- @include('layouts.partials.gallery')--}}
 
 
       <!-- Section Services  Last section-->
