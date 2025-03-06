@@ -11,7 +11,7 @@
 
             </div>
             <div class="card-body">
-
+                <div class="table-responsive"> 
                 <table class="table text-center">
                     <thead>
                         <tr>
@@ -68,6 +68,7 @@
 
                     </tbody>
                 </table>
+                </div>
             </div>
             <div class="card-footer">
 

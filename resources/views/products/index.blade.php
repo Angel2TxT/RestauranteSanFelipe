@@ -7,11 +7,14 @@
         <div class="card shadow">
             <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                 <h3 class="m-0 font-weight-bold text-primary"> Products</h3>
+                <div class="ml-auto">
+                    <a href="{{ route('reports.pdf', 'products') }}" class="btn btn-danger">Generar PDF</a>
+                </div>
                 <a href="{{route('products.create')}}" class="btn btn-primary">Crear</a>
 
             </div>
             <div class="card-body">
-
+            <div class="table-responsive"> 
                 <table class="table text-center">
                     <thead>
                         <tr>
@@ -70,6 +73,7 @@
 
                     </tbody>
                 </table>
+                </div>
             </div>
             <div class="card-footer">
 

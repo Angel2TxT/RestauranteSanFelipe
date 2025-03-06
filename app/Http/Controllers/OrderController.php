@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use App\Services\Mailing;
 use Illuminate\Support\Facades\DB;
 use Gloudemans\Shoppingcart\Facades\Cart;
+use Barryvdh\DomPDF\Facade\Pdf as PDF;
 
 class OrderController extends Controller
 {
@@ -83,7 +84,7 @@ class OrderController extends Controller
             $item->product_id = $product->id;
             $item->fecha = date('Y-m-d');
             $item->save();
-            $order->items()->attach($product->id, [
+            $order->items()->attach($item->id, [
                 'qty' => $product->qty,
                 'fecha' => date('Y-m-d'),
             ]);
@@ -123,6 +124,41 @@ class OrderController extends Controller
 
         return redirect()->back()->with(['msg' => 'Estado de la orden actualizado']);
     }
+
+
+   
+
+    public function report(Request $request)
+{
+    // Obtener las fechas de inicio y fin
+    $startDate = $request->input('start_date');
+    $endDate = $request->input('end_date');
+
+    // Asegúrate de que las fechas estén en formato correcto
+    // Si es necesario, puedes convertirlas a un formato que MySQL acepte (Y-m-d)
+    $startDate = \Carbon\Carbon::createFromFormat('Y-m-d', $startDate)->startOfDay();
+    $endDate = \Carbon\Carbon::createFromFormat('Y-m-d', $endDate)->endOfDay();
+
+    // Si se proporcionan las fechas, filtrar las órdenes
+    if ($startDate && $endDate) {
+        // Filtrar las órdenes por el rango de fechas
+        $orders = Order::whereBetween('created_at', [$startDate, $endDate])
+                    ->orderBy('created_at', 'desc')
+                    ->paginate(5);
+    } else {
+        // Si no se proporcionan fechas, mostrar todas las órdenes
+        $orders = Order::orderBy('created_at', 'desc')->paginate(5);
+    }
+
+    return view('orders.report', compact('orders'));
+}
+
+
+
+
+
+// Si se proporcionan las fechas, filtramos las órdenes
+        
 
     public function index()
     {

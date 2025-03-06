@@ -35,20 +35,15 @@
                 </div>
             </a>
 
+            <!-- Sidebar - Title -->
+            <div class="sidebar-heading">
+                Menú de Administración
+            </div>
+
             <!-- Divider -->
             <hr class="sidebar-divider my-0">
 
             <!-- Nav Item - Dashboard -->
-            {{-- <li class="nav-item active">
-                <a class="nav-link" href="{{ route('admin.home') }}">
-                    <i class="fas fa-fw fa-tachometer-alt"></i>
-                    <span>Administración</span>
-                </a>
-            </li> --}}
-
-            <!-- Divider -->
-            <hr class="sidebar-divider my-0">
-
             <!-- Nav Item - Deslizadores -->
             <li class="nav-item">
                 <a class="nav-link" href="{{ route('sliders.index') }}">
@@ -89,6 +84,27 @@
                 </a>
             </li>
 
+            <!-- Nav Item - Reportes -->
+            <li class="nav-item">
+                <a class="nav-link" href="{{ route('reports.index') }}">
+                    <i class="fas fa-fw fa-chart-line"></i>
+                    <span>Reportes</span>
+                </a>
+            </li>
+
+           
+
+            <!-- Divider -->
+            <hr class="sidebar-divider">
+
+            <!-- Nav Item - Agregar Producto -->
+            <li class="nav-item">
+                <a class="nav-link btn btn-primary text-white" href="{{ route('products.create') }}">
+                    <i class="fas fa-fw fa-plus"></i>
+                    <span>Agregar Producto</span>
+                </a>
+            </li>
+
             <!-- Divider -->
             <hr class="sidebar-divider d-none d-md-block">
 
@@ -122,14 +138,13 @@
 
                             <!-- Dropdown - User Information -->
                             <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="userDropdown">
-                                <a class="dropdown-item" href="#">
+                                <a class="dropdown-item" href="{{ route('profile.edit') }}">
                                     <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
-                                    Perfil
+                                    Editar perfil
                                 </a>
-
                                 <div class="dropdown-divider"></div>
                                 <a class="dropdown-item" href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                                    <i class="fas fa-sign-out-alt me-2"></i> {{ __('Logout') }}
+                                    <i class="fas fa-sign-out-alt me-2"></i> {{ __('Cerrar sesión') }}
                                 </a>
                                 <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
                                     @csrf
@@ -191,12 +206,10 @@
 
     <!-- Sidebar Toggle Script -->
     <script>
-        // Función para guardar el estado del sidebar en una cookie
         function setSidebarState(state) {
             document.cookie = "sidebarState=" + state + ";path=/";
         }
 
-        // Función para obtener el estado del sidebar desde la cookie
         function getSidebarState() {
             var name = "sidebarState=";
             var decodedCookie = decodeURIComponent(document.cookie);
@@ -210,26 +223,21 @@
         }
 
         $(document).ready(function() {
-            // Revisar el estado guardado en la cookie
             var sidebarState = getSidebarState();
             if (sidebarState == "toggled") {
                 $("#sidebar").addClass("toggled");
             }
 
-            // Manejar el toggle del sidebar
             $("#sidebarToggleTop").click(function() {
                 $("#sidebar").toggleClass("toggled");
-                // Guardar el estado en la cookie
                 setSidebarState($("#sidebar").hasClass("toggled") ? "toggled" : "");
             });
 
-            // Cuando la pantalla es más grande de 992px, el sidebar se mantiene abierto
             if ($(window).width() > 992) {
                 $("#sidebar").removeClass("toggled");
             }
         });
 
-        // Manejar el cambio de tamaño de la ventana
         $(window).resize(function() {
             if ($(window).width() > 992) {
                 $("#sidebar").removeClass("toggled");

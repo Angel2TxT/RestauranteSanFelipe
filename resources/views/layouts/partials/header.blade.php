@@ -15,9 +15,19 @@
                         <button class="rd-navbar-toggle"
                             data-rd-navbar-toggle=".rd-navbar-nav-wrap"><span></span></button>
                         <!-- RD Navbar Brand-->
-                        <div class="rd-navbar-brand"><a class="brand" href=""><img class="brand-logo-dark"
-                                    src="images/logoSFB.png" alt="" width="198" height="66" style="position: relative; left: -10px;" /></a>
+                        <div class="rd-navbar-qr-button">
+                            <button type="button" class="btn btn-primary btn-sm px-2 py-2" data-bs-toggle="modal"
+                                data-bs-target="#qrModal">
+                                <i class="fas fa-qrcode" style="font-size: 0.8rem;"></i>
+                                <!-- Puedes ajustar el tamaño del ícono también -->
+                            </button>
                         </div>
+
+                        <div class="rd-navbar-brand"><a class="brand" href=""><img class="brand-logo-dark"
+                                    src="images/logoSFB.png" alt="" width="198" height="66"
+                                    style="position: relative; left: 5px;" /></a>
+                        </div>
+
                     </div>
                     <div class="rd-navbar-right rd-navbar-nav-wrap">
                         <div class="rd-navbar-aside">
@@ -32,7 +42,9 @@
                                 <li>
                                     <div class="unit unit-spacing-xs">
                                         <div class="unit-left"><span class="icon mdi mdi-map-marker"></span></div>
-                                        <div class="unit-body"><a class="address" href="https://maps.app.goo.gl/s5PKDvSKJ95TUJmh6">Tila, chiapas, Segunda Sur Ote.</a></div>
+                                        <div class="unit-body"><a class="address"
+                                                href="https://maps.app.goo.gl/s5PKDvSKJ95TUJmh6">Tila, chiapas, Segunda
+                                                Sur Ote.</a></div>
                                     </div>
                                 </li>
                             </ul>
@@ -52,9 +64,9 @@
                                 <li class="rd-nav-item {{ Request::is('shop') ? 'active' : '' }}">
                                     <a class="rd-nav-link" href="{{ route('shop') }}">Productos</a>
                                 </li>
-                                
 
-                                
+
+
 
                                 @guest
 
@@ -74,7 +86,7 @@
                                             </button>
                                             <div class="dropdown-menu">
 
-                                                <a class="dropdown-item" href="{{route('orders.my')}}">
+                                                <a class="dropdown-item" href="{{ route('orders.my') }}">
                                                     Mis Ordenes
                                                 </a>
                                                 <div class="dropdown-divider"></div>
@@ -98,16 +110,34 @@
 
 
                             </ul>
+
+                            @auth
+                                <div class="rd-navbar-qr-button ms-auto">
+                                    <button type="button" class="btn btn-primary btn-sm px-5 py-4" data-bs-toggle="modal"
+                                        data-bs-target="#qrModal" onclick="changeImage()">
+                                        <i class="fas fa-qrcode" style="font-size: 0.8rem;"> qr</i>
+                                    </button>
+                                </div>
+                            @endauth
+
+
+
                         </div>
+
                     </div>
+
                     <div class="rd-navbar-project-hamburger rd-navbar-project-hamburger-open rd-navbar-fixed-element-1"
                         data-multitoggle=".rd-navbar-inner" data-multitoggle-blur=".rd-navbar-wrap"
                         data-multitoggle-isolate="data-multitoggle-isolate">
-                        <span class="fas fa-shopping-cart" style="font-size: 1.3rem; margin-left: -50px;"><span style="font-size: 1rem">{{Cart::instance('shopping')->content()->count()}}</span></span>
+                        <span class="fas fa-shopping-cart" style="font-size: 1.5 rem; margin-left: -50px;"><span
+                                style="font-size: 1rem">{{ Cart::instance('shopping')->content()->count() }}</span></span>
 
                     </div>
+
                     <div class="rd-navbar-project">
+
                         <div class="rd-navbar-project-header">
+
                             <h5 class="rd-navbar-project-title">Carrito</h5>
                             <div class="rd-navbar-project-hamburger rd-navbar-project-hamburger-close"
                                 data-multitoggle=".rd-navbar-inner" data-multitoggle-blur=".rd-navbar-wrap"
@@ -125,17 +155,64 @@
 
 
 
-                                        <a href="{{route('orders.checkout')}}" class="button button-secondary button-winona">Checkout</a>
+                                        <a href="{{ route('orders.checkout') }}"
+                                            class="button button-secondary button-winona">Checkout</a>
 
                                     </div>
 
 
                                 </div>
+
                             </div>
+
                         </div>
+
                     </div>
+
+
                 </div>
+
             </div>
+
         </nav>
+
     </div>
 </header>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.min.js"></script>
+<!-- Modal para mostrar la imagen -->
+
+
+
+
+<div class="modal fade" id="qrModal" tabindex="-1" aria-labelledby="qrModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="qrModalLabel">CÓDIGO QR</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+                <img id="qrImage" src="{{ asset('images/QR3.png') }}" alt="QR Code" class="img-fluid"
+                    style="max-width: 50%; cursor: pointer;" onclick="changeImage()">
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Agregar el siguiente JavaScript para cambiar las imágenes -->
+<script>
+    let qrImages = [
+        '{{ asset('images/QR4.png') }}',
+        '{{ asset('images/QR5.png') }}', // Primera imagen
+        '{{ asset('images/QR3.png') }}' // Tercera imagen
+    ];
+    let currentIndex = 0;
+
+    function changeImage() {
+        // Cambiar la imagen cada vez que se hace clic
+        currentIndex = (currentIndex + 1) % qrImages.length; // Esto asegura que se recorra el arreglo circularmente
+        document.getElementById('qrImage').src = qrImages[currentIndex];
+    }
+</script>

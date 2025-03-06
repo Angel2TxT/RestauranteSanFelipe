@@ -3,11 +3,16 @@
 @section('content')
 <div class="card shadow">
     <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-        <h3 class="m-0 font-weight-bold text-primary"> Orders</h3>
+        <h3 class="m-0 font-weight-bold text-primary">Órdenes</h3>
+        <!-- Botón de PDF alineado a la derecha -->
+        <div class="ml-auto">
+            <a href="{{ route('reports.pdf', 'orders') }}" class="btn btn-danger">Generar PDF</a>
+        </div>
     </div>
+    
     <div class="card-body">
-
-        <div class="table-responsive"> <!-- Añadimos table-responsive aquí -->
+        
+        <div class="table-responsive"> 
             <table class="table text-center">
                 <thead>
                     <tr>

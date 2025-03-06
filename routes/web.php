@@ -5,9 +5,12 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\ReportController;
 use App\Http\Controllers\SliderController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\NotificationController;
 
 // Route::get('/', function () {
 //     return view('welcome');
@@ -44,6 +47,16 @@ Route::group(["prefix"=>"admin","middleware"=>['auth']], function(){
     Route::resource('users', UserController::class);
 
     Route::get('orders/status/{order}', [OrderController::class, 'changeStatus'])->name('orders.status');
+    Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
+    
+    Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
+    Route::get('/report/orders', [ReportController::class, 'ordersReport'])->name('orders.report');
+    Route::get('/report/users', [ReportController::class, 'usersReport'])->name('users.report');
+    Route::get('/report/products', [ReportController::class, 'productsReport'])->name('products.report');
+    Route::get('/report/pdf', [ReportController::class, 'generatePDF'])->name('report.pdf');
+    Route::get('/reports/generate', [ReportController::class, 'generate'])->name('report.generate');
+    Route::get('/reports/{type}/pdf', [ReportController::class, 'generatePDF'])->name('reports.pdf');
+
 
 });
 

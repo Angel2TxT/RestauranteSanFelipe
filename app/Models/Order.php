@@ -11,21 +11,29 @@ class Order extends Model
 
     protected $fillable = ['total', 'notes', 'status', 'fecha', 'user_id', 'order_type', 'address', 'table_id'];
 
-
+    /**
+     * Relación con los items de la orden.
+     * La orden puede tener muchos items (muchos a muchos).
+     */
     public function items()
     {
         return $this->belongsToMany(Item::class, 'item_order')
                     ->withPivot(['qty', 'fecha']);
     }
-    
 
-
-        public function table()
+    /**
+     * Relación con la mesa asociada a la orden.
+     * Cada orden está asociada a una mesa (si es tipo "dine_in").
+     */
+    public function table()
     {
         return $this->belongsTo(Table::class);
     }
 
-
+    /**
+     * Relación con el usuario que realizó la orden.
+     * Una orden pertenece a un único usuario.
+     */
     public function user()
     {
         return $this->belongsTo(User::class);

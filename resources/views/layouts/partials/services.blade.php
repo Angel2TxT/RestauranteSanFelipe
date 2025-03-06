@@ -12,7 +12,7 @@
           <div class="box-icon-megan-header">
             <div class="box-icon-megan-icon linearicons-map2"></div>
           </div>
-          <h5 class="box-icon-megan-title"><a href="#">Ubicacion</a></h5>
+          <h5 class="box-icon-megan-title"><a href="https://maps.app.goo.gl/s5PKDvSKJ95TUJmh6">Ubicacion</a></h5>
           <p class="box-icon-megan-text">El restaurante esta situado frente a la iglesia de Tila.</p>
         </article>
         <article class="box-icon-megan wow fadeInUp" data-wow-delay=".1s">

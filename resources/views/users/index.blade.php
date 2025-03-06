@@ -4,11 +4,14 @@
 <div class="card shadow">
     <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
         <h3 class="m-0 font-weight-bold text-primary"> Usarios</h3>
+        <div class="ml-auto">
+            <a href="{{ route('reports.pdf', 'users') }}" class="btn btn-danger">Generar PDF</a>
+        </div>
         <a href="{{route('users.create')}}" class="btn btn-primary">Crear</a>
 
     </div>
     <div class="card-body">
-
+        <div class="table-responsive"> 
         <table class="table text-center">
             <thead>
                 <tr>
@@ -68,6 +71,7 @@
 
             </tbody>
         </table>
+        </div>
     </div>
     <div class="card-footer">
 
