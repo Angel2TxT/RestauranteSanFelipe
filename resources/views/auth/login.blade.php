@@ -55,3 +55,42 @@
     </div>
 </div>
 @endsection
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        document.addEventListener("keydown", function (event) {
+            if (event.getModifierState("CapsLock")) {
+                showCapsLockWarning(true);
+            } else {
+                showCapsLockWarning(false);
+            }
+        });
+
+        document.addEventListener("keyup", function (event) {
+            if (!event.getModifierState("CapsLock")) {
+                showCapsLockWarning(false);
+            }
+        });
+
+        function showCapsLockWarning(show) {
+            let warning = document.getElementById("caps-lock-warning");
+
+            if (!warning) {
+                warning = document.createElement("div");
+                warning.id = "caps-lock-warning";
+                warning.style.position = "fixed";
+                warning.style.bottom = "20px";
+                warning.style.right = "20px";
+                warning.style.backgroundColor = "red";
+                warning.style.color = "white";
+                warning.style.padding = "10px";
+                warning.style.borderRadius = "5px";
+                warning.style.boxShadow = "0 0 10px rgba(0,0,0,0.5)";
+                warning.style.display = "none";
+                warning.innerText = "⚠️ Bloq Mayús está activado";
+                document.body.appendChild(warning);
+            }
+
+            warning.style.display = show ? "block" : "none";
+        }
+    });
+</script>

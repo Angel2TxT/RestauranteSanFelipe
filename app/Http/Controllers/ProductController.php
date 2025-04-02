@@ -13,14 +13,14 @@ class ProductController extends Controller
      */
     public function index()
     {
-        $products = Product::orderBy('id','desc')->paginate(2);
-        return view('products.index',compact('products'));
+        $products = Product::orderBy('id', 'desc')->paginate(2);
+        return view('products.index', compact('products'));
     }
 
     public function display(Product $product)
     {
-        return view('products.show',compact('product'));
-    }   
+        return view('products.show', compact('product'));
+    }
 
     /**
      * Show the form for creating a new resource.
@@ -28,8 +28,8 @@ class ProductController extends Controller
     public function create()
     {
         $categories = Category::all();
-        
-        return view('products.create',compact('categories'));
+
+        return view('products.create', compact('categories'));
     }
 
     /**
@@ -37,7 +37,7 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
-        $this->validate($request,[
+        $this->validate($request, [
             'name' => 'required|max:255',
             'description' => 'max:255',
             'price' => 'required|min:0|numeric',
@@ -54,19 +54,27 @@ class ProductController extends Controller
         $product->label = $request->get('label');
         $product->category_id = $request->get('category');
 
-        if($request->hasFile('image')){
-
+        // Para el método store:
+        if ($request->hasFile('image')) {
             $imagen = $request->file('image');
-            $nameImage = "images/products/".uniqid().'.'.$imagen->guessExtension();
-            $ruta = public_path("images/products/");
-            $imagen->move($ruta,$nameImage);
-            $product->image = $nameImage;
+            $nameImage = "images/products/" . uniqid() . '.' . $imagen->guessExtension();
 
+            // Ruta a la carpeta 'public/images/products'
+            $ruta = public_path("images/products/");
+
+            // Asegúrate de que el directorio exista
+            if (!file_exists($ruta)) {
+                mkdir($ruta, 0777, true); // Crea la carpeta si no existe
+            }
+
+            // Mover la imagen a la carpeta
+            $imagen->move($ruta, $nameImage);
+            $product->image = $nameImage; // Guarda el nombre de la imagen
         }
 
         $product->save();
 
-        return redirect()->route('products.index')->with(["msg"=>"Producto creado correctamente"]);
+        return redirect()->route('products.index')->with(["msg" => "Producto creado correctamente"]);
     }
 
     /**
@@ -83,16 +91,18 @@ class ProductController extends Controller
     public function edit(Product $product)
     {
         $categories = Category::all();
-        
-        return view('products.edit',compact('categories','product'));
+
+        return view('products.edit', compact('categories', 'product'));
     }
 
     /**
      * Update the specified resource in storage.
      */
+
+
     public function update(Request $request, Product $product)
     {
-        $this->validate($request,[
+        $this->validate($request, [
             'name' => 'required|max:255',
             'description' => 'max:255',
             'price' => 'required|min:0|numeric',
@@ -109,26 +119,37 @@ class ProductController extends Controller
         $product->label = $request->get('label');
         $product->category_id = $request->get('category');
 
-        if($request->hasFile('image')){
+        // Para el método update:
+        if ($request->hasFile('image')) {
 
-            
-            $path = public_path().'/'.$product->image;
+            // Elimina la imagen anterior si existe
+            $path = public_path() . '/' . $product->image;
 
-            if (file_exists($path) && $product->image!==null) {
-                unlink($path);
+            if (file_exists($path) && $product->image !== null) {
+                unlink($path); // Elimina la imagen existente
             }
 
+            // Subir la nueva imagen
             $imagen = $request->file('image');
-            $nameImage = "images/products/".uniqid().'.'.$imagen->guessExtension();
-            $ruta = public_path("images/products/");
-            $imagen->move($ruta,$nameImage);
-            $product->image = $nameImage;
+            $nameImage = "images/products/" . uniqid() . '.' . $imagen->guessExtension();
 
+            // Ruta a la carpeta 'public/images/products'
+            $ruta = public_path("images/products/");
+
+            // Asegúrate de que el directorio exista
+            if (!file_exists($ruta)) {
+                mkdir($ruta, 0777, true); // Crea la carpeta si no existe
+            }
+
+            // Mover la imagen a la carpeta
+            $imagen->move($ruta, $nameImage);
+            $product->image = $nameImage; // Guarda el nombre de la imagen
         }
+
 
         $product->update();
 
-        return redirect()->route('products.index')->with(["msg"=>"Producto editado correctamente"]);
+        return redirect()->route('products.index')->with(["msg" => "Producto editado correctamente"]);
     }
 
     /**
@@ -136,15 +157,14 @@ class ProductController extends Controller
      */
     public function destroy(Product $product)
     {
-        $path = public_path().'/'.$product->image;
+        $path = public_path() . '/' . $product->image;
 
-        if (file_exists($path) && $product->image!==null) {
+        if (file_exists($path) && $product->image !== null) {
             unlink($path);
         }
 
         $product->delete();
 
-        return redirect()->route('products.index')->with(["msg"=>"Producto eliminado correctamente"]);
-    
+        return redirect()->route('products.index')->with(["msg" => "Producto eliminado correctamente"]);
     }
 }

@@ -6,7 +6,7 @@
 
         <div class="card shadow">
             <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                <h3 class="m-0 font-weight-bold text-primary"> Sliders</h3>
+                <h3 class="m-0 font-weight-bold text-primary"> Deslizadores</h3>
                 <a href="{{route('sliders.create')}}" class="btn btn-primary">Crear</a>
 
             </div>
@@ -19,8 +19,8 @@
                             <th scope="col">Imagen</th>
                             <th scope="col">Titulo</th>
                             <th scope="col">Descripcion</th>
-                            <th scope="col">Link</th>
-                            <th scope="col">Text Link</th>
+                            <th scope="col">Nombre del producto</th>
+                            <th scope="col">Boton de comprar</th>
                             <th scope="col">...</th>
                             <th scope="col">...</th>
                         </tr>

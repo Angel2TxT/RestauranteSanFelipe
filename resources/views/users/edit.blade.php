@@ -5,31 +5,36 @@
         <div class="card shadow">
             <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                 <h3 class="m-0 font-weight-bold text-primary"> Editar Usuario</h3>
-                <a href="" class="btn btn-primary">Volver</a>
+                <a href="{{ route('users.index') }}" class="btn btn-primary">Volver</a>
             </div>
             <div class="card-body">
                 <x-errors />
-                <form method="POST" action="{{ route('users.update',$user->id) }}" class="form-row" enctype="multipart/form-data">
+                <form method="POST" action="{{ route('users.update', $user->id) }}" class="form-row"
+                    enctype="multipart/form-data">
                     @csrf
                     @method('PATCH')
 
                     <div class="form-group col-md-6">
                         <label for="name">Nombre*</label>
-                        <input class="form-control" id="name" type="name" value="{{ $user->name }}" name="name">
+                        <input class="form-control" id="name" type="name" value="{{ $user->name }}"
+                            name="name">
                     </div>
 
                     <div class="form-group col-md-6">
                         <label for="last_name">Apellido</label>
-                        <input class="form-control" id="last_name" type="text" value="{{ $user->last_name }}" name="last_name">
+                        <input class="form-control" id="last_name" type="text" value="{{ $user->last_name }}"
+                            name="last_name">
                     </div>
 
                     <div class="form-group col-md-6">
                         <label for="email">Email*</label>
-                        <input class="form-control" id="email" type="email" value="{{ $user->email }}" name="email">
+                        <input class="form-control" id="email" type="email" value="{{ $user->email }}"
+                            name="email">
                     </div>
                     <div class="form-group col-md-6">
                         <label for="address">Direccion</label>
-                        <input class="form-control" id="address" type="text" value="{{ $user->address }}" name="address">
+                        <input class="form-control" id="address" type="text" value="{{ $user->address }}"
+                            name="address">
                     </div>
 
                     <div class="form-group col-md-6">
@@ -44,20 +49,26 @@
                     <div class="form-group col-md-6">
 
                         <label for="phone">Numero</label>
-                        <input class="form-control" id="phone" type="text" value="{{ $user->phone }}" name="phone">
+                        <input class="form-control" id="phone" type="text" value="{{ $user->phone }}"
+                            name="phone">
 
                     </div>
                     <div class="form-group col-md-6">
                         <div class="form-check" style="margin-top: 2rem">
-                            <input class="form-check-input" type="checkbox" id="admin" name="admin" @if($user->admin) checked @endif>
-                            <label class="form-check-label" for="admin">
-                              Admin
-                            </label>
+                            <label for="role" class="form-label">Tipo de Usuario</label>
+                            <select name="role" id="role" class="form-control">
+                                <option value="0" {{ $user->role == 0 ? 'selected' : '' }}>Cliente</option>
+                                <option value="1" {{ $user->role == 1 ? 'selected' : '' }}>Administrador</option>
+                                <option value="2" {{ $user->role == 2 ? 'selected' : '' }}>Empleado</option>
+                                <option value="3" {{ $user->role == 3 ? 'selected' : '' }}>Repartidor</option>
+                            </select>
+                            
+                            
                         </div>
                     </div>
 
                     <div class="col-6 text-center">
-                        <img src="{{asset($user->image)}}" width="100">
+                        <img src="{{ asset($user->image) }}" width="100">
                     </div>
 
                     <div class="col-6">

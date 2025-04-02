@@ -1,16 +1,23 @@
 <?php
 
+use App\Http\Controllers\ReportController;
+
+
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\AdminController;
+
 use App\Http\Controllers\OrderController;
-use App\Http\Controllers\ReportController;
 use App\Http\Controllers\SliderController;
 use App\Http\Controllers\ProductController;
+
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\CategoryController;
-use App\Http\Controllers\NotificationController;
+use App\Http\Middleware\BlockAccessMiddleware;
+
+
 
 // Route::get('/', function () {
 //     return view('welcome');
@@ -28,6 +35,7 @@ Route::get('products/display/{product}', [ProductController::class, 'display'])-
 Route::get('categories/display/{category}', [CategoryController::class, 'show'])->name('categories.display');
 
 Route::get('cart/{product}', [CartController::class, 'add'])->name('cart.add');
+Route::patch('cart/update/{rowId}', [CartController::class, 'update'])->name('cart.update');
 Route::get('cart/remove/{rowId}', [CartController::class, 'remove'])->name('cart.remove');
 
 Route::get('order/checkout', [OrderController::class, 'checkout'])->name('orders.checkout');
@@ -38,24 +46,19 @@ Route::get('my-orders', [OrderController::class, 'myOrders'])->name('orders.my')
 
 Route::group(["prefix"=>"admin","middleware"=>['auth']], function(){
 
-    Route::get('home', [App\Http\Controllers\AdminController::class, 'index'])->name('admin.home');
+    Route::get('home', [App\Http\Controllers\AdminController::class, 'index'])->name('admin.home')->middleware(BlockAccessMiddleware::class);
 
-    Route::resource('sliders', SliderController::class);
-    Route::resource('categories', CategoryController::class);
-    Route::resource('products', ProductController::class);
-    Route::resource('orders', OrderController::class);
-    Route::resource('users', UserController::class);
-
-    Route::get('orders/status/{order}', [OrderController::class, 'changeStatus'])->name('orders.status');
-    Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::resource('sliders', SliderController::class)->middleware(BlockAccessMiddleware::class);
+    Route::resource('categories', CategoryController::class)->middleware(BlockAccessMiddleware::class);
+    Route::get('/orders/{order}/revert', [OrderController::class, 'revertStatus'])->name('orders.revert')->middleware(BlockAccessMiddleware::class);
+    Route::resource('products', ProductController::class)->middleware(BlockAccessMiddleware::class);
+    Route::resource('orders', OrderController::class)->middleware(BlockAccessMiddleware::class);
+    Route::resource('users', UserController::class)->middleware(BlockAccessMiddleware::class);
+    Route::get('reports/users/{userId}', [ReportController::class, 'generateUserReport'])->name('reports.userReport')->middleware(BlockAccessMiddleware::class);
+    Route::get('orders/{order}/report', [ReportController::class, 'generateOrderReport'])->name('orders.report')->middleware(BlockAccessMiddleware::class);
+    Route::get('orders/status/{order}', [OrderController::class, 'changeStatus'])->name('orders.status')->middleware(BlockAccessMiddleware::class);
+    Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit')->middleware(BlockAccessMiddleware::class);
     
-    Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
-    Route::get('/report/orders', [ReportController::class, 'ordersReport'])->name('orders.report');
-    Route::get('/report/users', [ReportController::class, 'usersReport'])->name('users.report');
-    Route::get('/report/products', [ReportController::class, 'productsReport'])->name('products.report');
-    Route::get('/report/pdf', [ReportController::class, 'generatePDF'])->name('report.pdf');
-    Route::get('/reports/generate', [ReportController::class, 'generate'])->name('report.generate');
-    Route::get('/reports/{type}/pdf', [ReportController::class, 'generatePDF'])->name('reports.pdf');
 
 
 });

@@ -24,7 +24,7 @@
                         </div>
 
                         <div class="rd-navbar-brand"><a class="brand" href=""><img class="brand-logo-dark"
-                                    src="images/logoSFB.png" alt="" width="198" height="66"
+                                    src="images/logoSFB.jpg" alt="" width="198" height="66"
                                     style="position: relative; left: 5px;" /></a>
                         </div>
 
@@ -125,7 +125,9 @@
                         </div>
 
                     </div>
-
+                    @auth
+                        
+                    
                     <div class="rd-navbar-project-hamburger rd-navbar-project-hamburger-open rd-navbar-fixed-element-1"
                         data-multitoggle=".rd-navbar-inner" data-multitoggle-blur=".rd-navbar-wrap"
                         data-multitoggle-isolate="data-multitoggle-isolate">
@@ -133,39 +135,59 @@
                                 style="font-size: 1rem">{{ Cart::instance('shopping')->content()->count() }}</span></span>
 
                     </div>
-
+                    @endauth
                     <div class="rd-navbar-project">
 
-                        <div class="rd-navbar-project-header">
+                        <div class="rd-navbar-project" style=" max-width: 1000px; min-width: 400px;">
 
-                            <h5 class="rd-navbar-project-title">Carrito</h5>
-                            <div class="rd-navbar-project-hamburger rd-navbar-project-hamburger-close"
-                                data-multitoggle=".rd-navbar-inner" data-multitoggle-blur=".rd-navbar-wrap"
-                                data-multitoggle-isolate="data-multitoggle-isolate">
-                                <div class="project-close"><span></span><span></span></div>
+                            <div class="rd-navbar-project-header">
+
+                                <h5 class="rd-navbar-project-title">Carrito</h5>
+                                <div class="rd-navbar-project-hamburger rd-navbar-project-hamburger-close"
+                                    data-multitoggle=".rd-navbar-inner" data-multitoggle-blur=".rd-navbar-wrap"
+                                    data-multitoggle-isolate="data-multitoggle-isolate">
+                                    <div class="project-close"><span></span><span></span></div>
+                                </div>
                             </div>
-                        </div>
-                        <div class="rd-navbar-project-content rd-navbar-content">
-                            <div>
-                                <div class="row gutters-20" data-lightgallery="group">
 
-                                    <div class="col-12">
+                            <div class="rd-navbar-project-content rd-navbar-content" style=" width: 100%;">
 
-                                        <x-cart />
+                                <div>
+                                    <div class="row gutters-20" data-lightgallery="group"
+                                        style="margin: 0 auto; width: 120%;">
+
+                                        <div class="col-lg-10 col-md-12"> <!-- Más espacio en pantallas grandes -->
+
+                                            <x-cart />
+
+                                            @if (Cart::instance('shopping')->count() > 0)
+                                                <a href="{{ route('orders.checkout') }}"
+                                                    class="button button-secondary button-winona">
+                                                    Checkout
+                                                </a>
+                                            @else
+                                                <div>
+                                                    <button class="button button-secondary button-winona" disabled>
+                                                        Checkout
+                                                    </button>
+                                                    <p class="mt-2 text-danger">No tienes productos en tu carrito.
+                                                        <a href="{{ route('shop') }}"
+                                                             class="text-primary">¿Deseas agregar uno?</a>
+                                                    </p>
+                                                </div>
+                                            @endif
 
 
 
-                                        <a href="{{ route('orders.checkout') }}"
-                                            class="button button-secondary button-winona">Checkout</a>
+                                        </div>
 
                                     </div>
-
-
                                 </div>
 
                             </div>
 
                         </div>
+
 
                     </div>
 

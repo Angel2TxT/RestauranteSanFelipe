@@ -9,7 +9,8 @@ use Illuminate\Http\Request;
 use App\Services\Mailing;
 use Illuminate\Support\Facades\DB;
 use Gloudemans\Shoppingcart\Facades\Cart;
-use Barryvdh\DomPDF\Facade\Pdf as PDF;
+use Carbon\Carbon;
+
 
 class OrderController extends Controller
 {
@@ -21,16 +22,20 @@ class OrderController extends Controller
     }
 
     public function checkout()
-{
-    // Obtener las mesas disponibles
-    $tables = Table::where('status', 'available')->get(); // Solo mesas disponibles
+    {
+        if (Cart::instance('shopping')->count() == 0) {
+            return redirect()->route('home')->with('error', 'El carrito está vacío.');
+        }
+    
+        // Obtener las mesas disponibles
+        $tables = Table::where('status', 'available')->get(); // Solo mesas disponibles
+    
+        // Pasar las mesas a la vista correctamente
+        return view('orders.checkout', compact('tables'));
+    }
+    
 
-    // Pasar las mesas a la vista
-    return view('orders.checkout', compact('tables'));
-}
-
-
-    public function proccesCheckout(Request $request)
+public function proccesCheckout(Request $request)
 {
     // Validación de los datos de entrada
     $this->validate($request, [
@@ -40,58 +45,66 @@ class OrderController extends Controller
         'phone' => 'required',
         'order_type' => 'required|in:dine_in,delivery,pickup',
         'address' => 'required_if:order_type,delivery',
-        'table_id' => 'required_if:order_type,dine_in', 
+        'table_id' => [
+            'required_if:order_type,dine_in', 
+            function ($attribute, $value, $fail) use ($request) {
+                if ($request->order_type === 'dine_in' && !Table::where('id', $value)->exists()) {
+                    $fail('La mesa seleccionada no es válida.');
+                }
+            }
+        ],
     ]);
     
+
     $user = auth()->user();
     $userEmail = $request->input('email');
 
     // Iniciar transacción para asegurar que todos los cambios se guarden correctamente
-    DB::transaction(function () use ($request, $userEmail) {
+    DB::transaction(function () use ($request, $userEmail, $user) {
         // Crear la orden
         $order = new Order();
-        $order->total = Cart::instance('shopping')->priceTotal();
+        $order->total = (float) str_replace(',', '', Cart::instance('shopping')->priceTotal());
+
         $order->notes = $request->get('notes');
-        $order->status = "Pending";
-        $order->fecha = date('Y-m-d');
-        $order->user_id = auth()->user()->id;
+        $order->status = "pending";
+        $order->fecha = Carbon::now('America/Mexico_City')->toDateString();
+        $order->user_id = $user->id;
         $order->order_type = $request->order_type;
 
-        if($request->order_type === 'dine_in' ){
-            $tableId = $request->input('table_id');
-            $tables = Table::find($tableId); // Busca la orden por ID
-            $tables->status = 'occupied'; // Cambia el estado
-            $tables->save(); 
+        // Manejo de mesas si es "dine_in"
+        if ($request->order_type === 'dine_in') {
+            $table = Table::find($request->table_id);
+            if ($table && $table->status === 'available') {
+                $table->status = 'occupied'; 
+                $table->save();
+                $order->table_id = $table->id;
+            } else {
+                throw new \Exception("La mesa seleccionada no está disponible.");
+            }
         }
 
-        // No asignar la dirección en la orden (ya está en el usuario)
-
-        // Asignar mesa si es una orden de tipo ""
-        $order->table_id = $request->order_type === 'dine_in' ? $request->table_id : null;
-
         $order->save();
-        $order->items = Cart::instance('shopping')->content();
-        // Enviar el correo después de guardar la orden
-        $this->mail->sendMessage($userEmail, $order);
-        error_log(json_encode($request->all()));
-        // Agregar items a la orden
+
+        // Agregar productos a la orden
         foreach (Cart::instance('shopping')->content() as $product) {
             $item = new Item();
             $item->name = $product->name;
             $item->price = $product->price;
             $item->qty = $product->qty;
-            $item->image = $product->options->image;
+            $item->image = $product->options->image ?? null; // Evitar error si no hay imagen
             $item->product_id = $product->id;
-            $item->fecha = date('Y-m-d');
+            $item->fecha = Carbon::now('America/Mexico_City')->toDateString();
             $item->save();
+
+            // Relacionar con la orden
             $order->items()->attach($item->id, [
                 'qty' => $product->qty,
-                'fecha' => date('Y-m-d'),
+                'fecha' => Carbon::now()->toDateString(),
             ]);
-            
-
         }
 
+        // Enviar el correo después de guardar la orden
+        $this->mail->sendMessage($userEmail, $order);
     });
 
     // Limpiar el carrito después de guardar la orden
@@ -100,6 +113,7 @@ class OrderController extends Controller
     // Redirigir con mensaje de éxito
     return redirect()->route('home')->with(['msg' => 'Orden creada correctamente.']);
 }
+
 
     public function myOrders()
     {
@@ -110,20 +124,45 @@ class OrderController extends Controller
 
     public function changeStatus(Order $order)
     {
-        // Cambiar el estado de la orden
-        if ($order->status === 'pending') {
-            $order->status = 'in_progress';
-            $order->update();
-        } elseif ($order->status === 'in_progress') {
-            $order->status = 'ready_for_delivery';
-            $order->update();
-        } elseif ($order->status === 'ready_for_delivery') {
-            $order->status = 'completed';
-            $order->update();
+        // Definir los estados en orden
+        $statusFlow = ['pending', 'in_progress', 'ready_for_delivery', 'paid', 'completed'];
+    
+        // Obtener el índice del estado actual
+        $currentIndex = array_search($order->status, $statusFlow);
+    
+        // Si el estado actual está en la lista y no es el último, avanzar al siguiente estado
+        if ($currentIndex !== false && $currentIndex < count($statusFlow) - 1) {
+            $order->status = $statusFlow[$currentIndex + 1];
+            $order->save();
+    
+            // Si la orden se completa, liberar la mesa si existe
+            if ($order->status === 'completed' && $order->table_id) {
+                $table = Table::find($order->table_id);
+                if ($table) {
+                    $table->status = 'available';
+                    $table->save();
+                }
+            }
         }
-
+    
         return redirect()->back()->with(['msg' => 'Estado de la orden actualizado']);
     }
+    
+
+public function revertStatus(Order $order)
+{
+    if ($order->status === 'ready_for_delivery') {
+        $order->status = 'in_progress';
+    } elseif ($order->status === 'paid') {
+        $order->status = 'ready_for_delivery';
+    }
+
+    $order->update();
+
+    return redirect()->back()->with(['msg' => 'Estado de la orden revertido']);
+}
+
+
 
 
    
@@ -160,15 +199,73 @@ class OrderController extends Controller
 // Si se proporcionan las fechas, filtramos las órdenes
         
 
-    public function index()
-    {
-        $orders = Order::with('table')->orderBy('id', 'desc')->paginate(5);
+public function index(Request $request)
+{
+    $search = $request->get('search');
+    $searchDate = $request->get('search_date');
+    $searchStatus = $request->get('search_status');
+    $searchOrderType = $request->get('search_order_type');
+    $searchTable = $request->get('search_table');
 
-        return view('orders.index', compact('orders'));
+    // Obtener todas las mesas para el filtro
+    $tables = Table::all();
+
+    // Mapeo de términos en español a los valores internos
+    $search = strtolower($search);
+    $searchMap = [
+        'local' => 'dine_in',
+        'envio' => 'delivery',
+        'recoger' => 'pickup',
+        'pendiente' => 'pending',
+        'proceso' => 'in_progress',
+        'entregar' => 'ready_for_delivery',
+        'pagado' => 'paid', // Agregado "pagado" con el nuevo estado "paid"
+        'completado' => 'completed',
+    ];
+
+    // Si el término de búsqueda se encuentra en el mapa, reemplázalo con el valor en inglés
+    if (array_key_exists($search, $searchMap)) {
+        $search = $searchMap[$search];
     }
+
+    // Filtrar las órdenes
+    $orders = Order::with('table', 'user')
+        ->when($search, function ($query, $search) {
+            return $query->where('id', 'like', "%$search%")
+                         ->orWhereHas('user', function ($q) use ($search) {
+                             $q->where('name', 'like', "%$search%");
+                         })
+                         ->orWhere('order_type', 'like', "%$search%")
+                         ->orWhere('status', 'like', "%$search%");
+        })
+        ->when($searchDate, function ($query, $searchDate) {
+            return $query->whereDate('fecha', '=', $searchDate);
+        })
+        ->when($searchStatus, function ($query, $searchStatus) {
+            return $query->where('status', '=', $searchStatus);
+        })
+        ->when($searchOrderType, function ($query, $searchOrderType) {
+            return $query->where('order_type', '=', $searchOrderType);
+        })
+        ->when($searchTable, function ($query, $searchTable) {
+            return $query->where('table_id', '=', $searchTable);
+        })
+        ->paginate(5);
+
+    return view('orders.index', compact('orders', 'tables'));
+}
+
+
+
+
+
 
     public function show(Order $order)
     {
+        
+        
+
+
         return view('orders.show', compact('order'));
     }
 

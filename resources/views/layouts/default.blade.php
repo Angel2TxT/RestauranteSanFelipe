@@ -43,7 +43,7 @@
             <div class="row row-30 align-items-center">
               <div class="col-sm-6 col-md-7 col-lg-4 col-xl-4">
                 <div class="row row-30 align-items-center text-lg-center">
-                  <div class="col-md-7 col-xl-8"><a class="brand" href="home"><img src="images/logoSFW.png" alt="" width="198" height="66"/></a></div>
+                  <div class="col-md-7 col-xl-8"><a class="brand" href="/"><img src="images/logoSFW.png" alt="Logo" width="198" height="66"/></a></div>
                   
                 </div>
               </div>
@@ -55,18 +55,13 @@
                       <div class="unit-body"><a class="phone" href="tel:9611724435">+52 961-172-4435</a></div>
                     </div>
                   </div>
-                  <div class="footer-modern-contacts wow slideInDown">
-                    <div class="unit unit-spacing-sm align-items-center">
-                      <div class="unit-left"><span class="icon mdi mdi-email"></span></div>
-                      <div class="unit-body"><a class="mail" href="mailto:#"></a></div>
-                    </div>
-                  </div>
+                  
                   <div class="wow slideInRight">
                     <ul class="list-inline footer-social-list footer-social-list-2 footer-social-list-3">
                       <li><a class="icon mdi mdi-facebook" href="https://web.facebook.com/hospedajesanfelipedejesus"></a></li>
-                      <li><a class="icon mdi mdi-twitter" href="#"></a></li>
+                      
                       <li><a class="icon mdi mdi-instagram" href="#"></a></li>
-                      <li><a class="icon mdi mdi-google-plus" href="#"></a></li>
+                      
                     </ul>
                   </div>
                 </div>

@@ -12,7 +12,9 @@
 
     <!-- Custom fonts for this template-->
     <link href="{{ asset('admin/vendor/fontawesome-free/css/all.min.css') }}" rel="stylesheet" type="text/css">
-    <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
+        rel="stylesheet">
 
     <!-- Bootstrap CSS from CDN for better responsivity -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -31,23 +33,34 @@
             <!-- Sidebar - Brand -->
             <a class="sidebar-brand d-flex align-items-center justify-content-center" href="{{ route('admin.home') }}">
                 <div>
-                    <img src="{{ asset('images/LogoN.png') }}" alt="San Felipe Logo" width="90" height="70" class="mr-2" />
+                    <img src="{{ asset('images/LogoN.png') }}" alt="San Felipe Logo" width="90" height="70"
+                        class="mr-2" />
                 </div>
             </a>
-
-            <!-- Sidebar - Title -->
-            <div class="sidebar-heading">
-                Menú de Administración
+            <br>
+            <hr class="sidebar-divider my-0">
+            <div class="sidebar-heading py-1 px-4 mb-3 text-center d-none d-md-block"
+                style="font-size: 1.1rem; font-weight: bold;">
+                <br> ADMINISTRADOR <br>
             </div>
+
+
+
 
             <!-- Divider -->
             <hr class="sidebar-divider my-0">
 
             <!-- Nav Item - Dashboard -->
+            <li class="nav-item">
+                <a class="nav-link" href="{{ route('admin.home') }}">
+                    <i class="fas fa-fw fa-cogs"></i>
+                    <span>Inicio</span>
+                </a>
+            </li>
             <!-- Nav Item - Deslizadores -->
             <li class="nav-item">
                 <a class="nav-link" href="{{ route('sliders.index') }}">
-                    <i class="fas fa-fw fa-chart-area"></i>
+                    <i class="fas fa-fw fa-image"></i>
                     <span>Deslizadores</span>
                 </a>
             </li>
@@ -55,7 +68,7 @@
             <!-- Nav Item - Categorías -->
             <li class="nav-item">
                 <a class="nav-link" href="{{ route('categories.index') }}">
-                    <i class="fas fa-fw fa-table"></i>
+                    <i class="fas fa-fw fa-tags"></i>
                     <span>Categorías</span>
                 </a>
             </li>
@@ -63,36 +76,30 @@
             <!-- Nav Item - Productos -->
             <li class="nav-item">
                 <a class="nav-link" href="{{ route('products.index') }}">
-                    <i class="fas fa-fw fa-table"></i>
+                    <i class="fas fa-fw fa-utensils"></i>
                     <span>Productos</span>
                 </a>
             </li>
+            @auth
+                @if (auth()->user()->isDelivery() || (auth()->user()->isEmployee() || auth()->user()->isAdmin()))
+                    <!-- Nav Item - Órdenes -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('orders.index') }}">
+                            <i class="fas fa-fw fa-clipboard-list"></i>
+                            <span>Órdenes</span>
+                        </a>
+                    </li>
+                @endif
+            @endauth
 
-            <!-- Nav Item - Órdenes -->
-            <li class="nav-item">
-                <a class="nav-link" href="{{ route('orders.index') }}">
-                    <i class="fas fa-fw fa-table"></i>
-                    <span>Órdenes</span>
-                </a>
-            </li>
 
             <!-- Nav Item - Usuarios -->
             <li class="nav-item">
                 <a class="nav-link" href="{{ route('users.index') }}">
-                    <i class="fas fa-fw fa-table"></i>
+                    <i class="fas fa-fw fa-users"></i>
                     <span>Usuarios</span>
                 </a>
             </li>
-
-            <!-- Nav Item - Reportes -->
-            <li class="nav-item">
-                <a class="nav-link" href="{{ route('reports.index') }}">
-                    <i class="fas fa-fw fa-chart-line"></i>
-                    <span>Reportes</span>
-                </a>
-            </li>
-
-           
 
             <!-- Divider -->
             <hr class="sidebar-divider">
@@ -104,6 +111,15 @@
                     <span>Agregar Producto</span>
                 </a>
             </li>
+
+            <!-- Nav Item - Agregar Categoría -->
+            <li class="nav-item">
+                <a class="nav-link btn btn-primary text-white" href="{{ route('categories.create') }}">
+                    <i class="fas fa-fw fa-plus"></i>
+                    <span>Agregar Categoría</span>
+                </a>
+            </li>
+
 
             <!-- Divider -->
             <hr class="sidebar-divider d-none d-md-block">
@@ -119,11 +135,14 @@
 
                 <!-- Topbar -->
                 <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
-                    <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3" data-toggle="collapse" data-target="#sidebar" aria-controls="sidebar" aria-expanded="false" aria-label="Toggle navigation">
+                    <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3"
+                        data-toggle="collapse" data-target="#sidebar" aria-controls="sidebar" aria-expanded="false"
+                        aria-label="Toggle navigation">
                         <i class="fa fa-bars"></i>
                     </button>
 
                     <a href="{{ route('home') }}" class="btn btn-primary" target="_blank">Ver sitio</a>
+                    <a href="https://drive.google.com/file/d/1DFvQfGHRMwgGOGZbpP3WknBAlsBtl3Vx/view?usp=drivesdk" class="btn btn-primary" style="margin-left: 10px">Descargar App</a>
 
                     <!-- Topbar Navbar -->
                     <ul class="navbar-nav ml-auto">
@@ -131,22 +150,29 @@
 
                         <!-- Nav Item - User Information -->
                         <li class="nav-item dropdown no-arrow">
-                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <span class="mr-2 d-none d-lg-inline text-gray-600 small">{{ auth()->user()->name }}</span>
-                                <img class="img-profile rounded-circle" src="{{ auth()->user()->image ? asset(auth()->user()->image) : asset('images/no-image.png') }}" alt="User Image">
+                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
+                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <span
+                                    class="mr-2 d-none d-lg-inline text-gray-600 small">{{ auth()->user()->name }}</span>
+                                <img class="img-profile rounded-circle"
+                                    src="{{ auth()->user()->image ? asset(auth()->user()->image) : asset('images/no-image.png') }}"
+                                    alt="User Image">
                             </a>
 
                             <!-- Dropdown - User Information -->
-                            <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="userDropdown">
+                            <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
+                                aria-labelledby="userDropdown">
                                 <a class="dropdown-item" href="{{ route('profile.edit') }}">
                                     <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
                                     Editar perfil
                                 </a>
                                 <div class="dropdown-divider"></div>
-                                <a class="dropdown-item" href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                                <a class="dropdown-item" href="{{ route('logout') }}"
+                                    onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                                     <i class="fas fa-sign-out-alt me-2"></i> {{ __('Cerrar sesión') }}
                                 </a>
-                                <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+                                <form id="logout-form" action="{{ route('logout') }}" method="POST"
+                                    class="d-none">
                                     @csrf
                                 </form>
                             </div>
@@ -158,12 +184,12 @@
                 <!-- Begin Page Content -->
                 <div class="container-fluid">
                     @if (session()->has('msg'))
-                    <div class="alert alert-success alert-dismissible fade show" role="alert">
-                        <strong>Mensaje!</strong> {{ session('msg') }}
-                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            <strong>Mensaje!</strong> {{ session('msg') }}
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
                     @endif
 
                     @yield('content')
@@ -241,7 +267,7 @@
         $(window).resize(function() {
             if ($(window).width() > 992) {
                 $("#sidebar").removeClass("toggled");
-                setSidebarState("");  // Eliminar el estado guardado
+                setSidebarState(""); // Eliminar el estado guardado
             } else {
                 var sidebarState = getSidebarState();
                 if (sidebarState == "toggled") {

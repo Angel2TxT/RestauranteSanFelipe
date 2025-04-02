@@ -35,8 +35,8 @@
             <tr>
               <th scope="col">#</th>
               <th scope="col">Total</th>
-              <th scope="col">Date</th>
-              <th scope="col">Status</th>
+              <th scope="col">Fecha</th>
+              <th scope="col">Estado</th>
 
             </tr>
           </thead>
@@ -51,10 +51,12 @@
 
                     @if ($order->status == 'pending') 
                     Orden pendiente 
-                  @elseif ($order->status == 'in_progress')
-                    Orden en proceso
-                  @elseif ($order->status == 'ready_for_delivery')
-                    Enviado
+                    @elseif ($order->status == 'in_progress')
+                    Tu orden esta en preparación
+                    @elseif ($order->status == 'ready_for_delivery')
+                    Tu orden esta lista
+                    @elseif ($order->status == 'paid') 
+                    Procede a pagar
                     @elseif ($order->status == 'completed')
                     Completado
                   @endif
@@ -64,8 +66,8 @@
 
               </tr>
             @endforeach
-
-
+              
+            
           </tbody>
         </table>
         <!-- Paginacion -->

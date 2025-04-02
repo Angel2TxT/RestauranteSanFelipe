@@ -29,6 +29,23 @@ class User extends Authenticatable
         'password',
     ];
 
+
+    public function isAdmin() {
+        return $this->role == 1;
+    }
+
+    public function isClient() {
+        return $this->role == 0;
+    }
+
+    public function isEmployee() {
+        return $this->role == 2;
+    }
+
+    public function isDelivery() {
+        return $this->role == 3;
+    }
+
     /**
      * Los atributos que deben ser ocultados para la serialización.
      *
@@ -91,8 +108,5 @@ class User extends Authenticatable
      * Método para enviar una notificación personalizada.
      * Esto es opcional, puedes enviar notificaciones directamente desde tu controlador o evento.
      */
-    public function sendCustomNotification()
-    {
-        $this->notify(new YourNotification());
-    }
+   
 }

@@ -1,5 +1,5 @@
 <!-- CART -->
-<table class="table table-sm">
+<table class="table table-responsive table-sm">
     <thead>
         <tr>
             <th scope="col">Imagen</th>
@@ -12,27 +12,34 @@
     </thead>
     <tbody>
         @forelse (Cart::instance('shopping')->content() as $product)
+    <form action="{{ route('cart.update', $product->rowId) }}" method="POST">
+        @csrf
+        @method('PATCH')
         <tr>
             <td>
-                <img src="{{asset($product->options->image)}}" width="40">
+                <img src="{{ asset($product->options->image) }}" width="40">
             </td>
-            <td>{{$product->name}}</td>
-            <td>${{$product->price}}</td>
-            <td>{{$product->qty}}</td>
-            <td>${{$product->price*$product->qty}}</td>
+            <td>{{ $product->name }}</td>
+            <td>${{ $product->price }}</td>
             <td>
-                <a href="{{route('cart.remove',$product->rowId)}}"><span class="fas fa-trash"></span></a>
+                <input type="number" name="qty" style="width: 50px;" min="1" max="5" value="{{ $product->qty }}" onblur="this.form.submit()" />
+            </td>
+            <td>${{ $product->price * $product->qty }}</td>
+            <td>
+                <a href="{{ route('cart.remove', $product->rowId) }}">
+                    <span class="fas fa-trash"></span>
+                </a>
             </td>
         </tr>
+    </form>
+@empty
+    <tr>
+        <td colspan="6">Sin productos</td>
+    </tr>
+@endforelse
 
 
-        @empty
 
-        <tr>
-            <td>Sin productos</td>
-        </tr>
-
-        @endforelse
         <tr>
             <td colspan="3"></td>
             <td>

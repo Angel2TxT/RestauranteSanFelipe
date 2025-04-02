@@ -6,9 +6,9 @@
 
         <div class="card shadow">
             <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                <h3 class="m-0 font-weight-bold text-primary"> Products</h3>
+                <h3 class="m-0 font-weight-bold text-primary"> Productos</h3>
                 <div class="ml-auto">
-                    <a href="{{ route('reports.pdf', 'products') }}" class="btn btn-danger">Generar PDF</a>
+                    {{-- <a href="{{ route('reports.pdf', 'products') }}" class="btn btn-danger">Generar PDF</a> --}}
                 </div>
                 <a href="{{route('products.create')}}" class="btn btn-primary">Crear</a>
 
@@ -48,9 +48,12 @@
                                     <span class="fas fa-edit"></span>
                                 </a>
                             </td>
+
+
                             <td>
 
-                                <form action="{{route('products.destroy',$product->id)}}" method="POST" class="confirm-form mb-0">
+                                <form action="{{route('products.destroy',$product->id)}}" method="POST" class="confirm-form mb-0"
+                                    onsubmit="return confirmDelete(this, event);">
                                     @csrf
                                     @method('DELETE')
 
@@ -60,6 +63,32 @@
 
                                 </form>
                             </td>
+
+
+                            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+                                <script>
+                                    function confirmDelete(form, event) {
+                                        event.preventDefault(); // Evita que el formulario se envíe de inmediato
+
+                                        Swal.fire({
+                                            title: "¿Estás seguro?",
+                                            text: "Esta acción no se puede deshacer.",
+                                            icon: "warning",
+                                            showCancelButton: true,
+                                            confirmButtonColor: "#d33",
+                                            cancelButtonColor: "#3085d6",
+                                            confirmButtonText: "Sí, eliminar",
+                                            cancelButtonText: "Cancelar"
+                                        }).then((result) => {
+                                            if (result.isConfirmed) {
+                                                form.submit(); // Si el usuario confirma, enviamos el formulario
+                                            }
+                                        });
+
+                                        return false; // Evita el envío automático del formulario
+                                    }
+                                </script>
+
                         </tr>
  
                         @empty

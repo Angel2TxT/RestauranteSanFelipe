@@ -46,13 +46,30 @@ class SliderController extends Controller
         $slider->text_link = $request->text_link;
 
         if ($request->hasFile('image')) {
+            // Eliminar la imagen anterior si existe
+            $path = public_path('images/sliders/') . $slider->image;
+            
+            // Verificamos si la imagen existe y no es nula antes de eliminarla
+            if (file_exists($path) && $slider->image !== null) {
+                unlink($path); // Elimina la imagen anterior
+            }
+        
+            // Subir la nueva imagen
             $imagen = $request->file('image');
-            $nameImage = "images/sliders/" . uniqid() . '.' . $imagen->guessExtension();
-            $ruta = public_path("images/sliders/");
+            $nameImage = 'images/sliders/' . uniqid() . '.' . $imagen->guessExtension();
+        
+            // Asegurarse de que la carpeta de destino exista
+            $ruta = public_path('images/sliders/');
+            if (!file_exists($ruta)) {
+                mkdir($ruta, 0777, true); // Crea el directorio si no existe
+            }
+        
+            // Mover la nueva imagen a la carpeta correspondiente
             $imagen->move($ruta, $nameImage);
+        
+            // Actualizar el nombre de la imagen en el modelo
             $slider->image = $nameImage;
         }
-
         $slider->save();
 
         return redirect()->route('sliders.index')->with(["msg" => "Slider creado correctamente"]);
@@ -85,17 +102,28 @@ class SliderController extends Controller
         $slider->text_link = $request->text_link;
 
         if ($request->hasFile('image')) {
-            // Eliminar imagen anterior si existe
+            // Eliminar la imagen anterior si existe y si no es la imagen predeterminada
             if ($slider->image && file_exists(public_path($slider->image))) {
-                unlink(public_path($slider->image));
+                unlink(public_path($slider->image)); // Elimina la imagen anterior
             }
-
+        
+            // Subir la nueva imagen
             $imagen = $request->file('image');
-            $nameImage = "images/sliders/" . uniqid() . '.' . $imagen->guessExtension();
-            $ruta = public_path("images/sliders/");
+            $nameImage = 'images/sliders/' . uniqid() . '.' . $imagen->guessExtension();
+        
+            // Asegurarse de que la carpeta de destino exista
+            $ruta = public_path('images/sliders/');
+            if (!file_exists($ruta)) {
+                mkdir($ruta, 0777, true); // Crea el directorio si no existe
+            }
+        
+            // Mover la nueva imagen a la carpeta correspondiente
             $imagen->move($ruta, $nameImage);
+        
+            // Actualizar el nombre de la imagen en el modelo
             $slider->image = $nameImage;
         }
+        
 
         $slider->save();
 

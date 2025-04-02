@@ -40,15 +40,26 @@ class CategoryController extends Controller
         $category->name = $request->get('name');
         $category->icon = $request->get('icon');
 
-        if($request->hasFile('image')){
+        if($request->hasFile('image')) {
 
             $imagen = $request->file('image');
             $nameImage = "images/categories/".uniqid().'.'.$imagen->guessExtension();
+            
+            // Usa public_path() para obtener la ruta correcta
             $ruta = public_path("images/categories/");
-            $imagen->move($ruta,$nameImage);
+        
+            // Asegúrate de que el directorio exista
+            if (!file_exists($ruta)) {
+                mkdir($ruta, 0777, true); // Crea el directorio si no existe
+            }
+        
+            // Mover la imagen a la carpeta
+            $imagen->move($ruta, $nameImage);
+        
+            // Guarda el nombre de la imagen en el modelo
             $category->image = $nameImage;
-
         }
+        
 
         $category->save();
 
@@ -87,21 +98,33 @@ class CategoryController extends Controller
         $category->name = $request->get('name');
         $category->icon = $request->get('icon');
 
-        if($request->hasFile('image')){
+        if($request->hasFile('image')) {
 
-            $path = public_path().'/'.$category->image;
-
-            if (file_exists($path) && $category->image!==null) {
-                unlink($path);
+            // Ruta de la imagen actual (si existe)
+            $path = public_path("images/categories/").$category->image;
+        
+            // Si la imagen existe y no es null, la eliminamos
+            if (file_exists($path) && $category->image !== null) {
+                unlink($path); // Elimina la imagen anterior
             }
-
+        
+            // Subir la nueva imagen
             $imagen = $request->file('image');
             $nameImage = "images/categories/".uniqid().'.'.$imagen->guessExtension();
+            
+            // Asegúrate de que el directorio de categorías exista
             $ruta = public_path("images/categories/");
-            $imagen->move($ruta,$nameImage);
+            if (!file_exists($ruta)) {
+                mkdir($ruta, 0777, true); // Crea el directorio si no existe
+            }
+        
+            // Mover la nueva imagen a la carpeta
+            $imagen->move($ruta, $nameImage);
+        
+            // Actualizar el nombre de la imagen en el modelo
             $category->image = $nameImage;
-
         }
+        
 
         $category->update();
 
@@ -113,14 +136,24 @@ class CategoryController extends Controller
      */
     public function destroy(Category $category)
     {
-        $path = public_path().'/'.$category->image;
-
-        if (file_exists($path) && $category->image!==null) {
+        // Verificar si la categoría tiene productos asociados
+        if ($category->products()->count() > 0) {
+            // Si tiene productos, redirige de nuevo con un mensaje de error
+            return redirect()->route('categories.index')->with('error', 'No se puede eliminar esta categoría porque tiene productos asociados.');
+        }
+    
+        // Si no tiene productos, procede a eliminar la imagen y la categoría
+        $path = public_path() . '/' . $category->image;
+    
+        if (file_exists($path) && $category->image !== null) {
             unlink($path);
         }
-
+    
+        // Eliminar la categoría
         $category->delete();
-
-        return redirect()->route('categories.index')->with(["msg"=>"Categoria eliminada correctamente"]);
+    
+        // Redirigir a la lista de categorías con un mensaje de éxito
+        return redirect()->route('categories.index')->with('msg', 'Categoría eliminada correctamente');
     }
+    
 }
