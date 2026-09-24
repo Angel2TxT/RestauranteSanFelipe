@@ -21,6 +21,7 @@
 
     <!-- Custom styles for this template-->
     <link href="{{ asset('admin/css/sb-admin-2.min.css') }}" rel="stylesheet">
+    <link href="{{ asset('css/fonts.css') }}" rel="stylesheet">
 </head>
 
 <body id="page-top">
@@ -155,7 +156,7 @@
                                 <span
                                     class="mr-2 d-none d-lg-inline text-gray-600 small">{{ auth()->user()->name }}</span>
                                 <img class="img-profile rounded-circle"
-                                    src="{{ auth()->user()->image ? asset(auth()->user()->image) : asset('images/no-image.png') }}"
+                                    src="{{ auth()->user()->image ? asset(auth()->user()->image) : asset('images/no-image.jpg') }}"
                                     alt="User Image">
                             </a>
 

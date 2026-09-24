@@ -41,7 +41,7 @@
                             <td>{{$product->description}}</td>
                             <td>${{$product->price}}</td>
                             
-                            <td>{{$product->category->name}}</td>
+                            <td>{{ $product->category->name ?? 'Sin categoría' }}</td>
 
                             <td>
                                 <a class="btn btn-primary btn-sm" href="{{route('products.edit',$product->id)}}">

@@ -197,6 +197,7 @@ class RestaurantSeeder extends Seeder
     private function seedTables(): void
     {
         Table::query()->delete();
+        \Illuminate\Support\Facades\DB::statement('ALTER TABLE tables AUTO_INCREMENT = 1');
 
         foreach (range(1, 10) as $n) {
             Table::create([
@@ -213,12 +214,15 @@ class RestaurantSeeder extends Seeder
             return;
         }
 
+        $tableOccupiedA = Table::where('name', 'Mesa 9')->value('id');
+        $tableOccupiedB = Table::where('name', 'Mesa 10')->value('id');
+
         $today = Carbon::now('America/Mexico_City')->toDateString();
         $samples = [
             ['status' => 'pending', 'type' => 'delivery', 'indices' => [0, 10, 13]],
-            ['status' => 'in_progress', 'type' => 'dine_in', 'table' => 9, 'indices' => [4, 11, 15]],
+            ['status' => 'in_progress', 'type' => 'dine_in', 'table' => $tableOccupiedA, 'indices' => [4, 11, 15]],
             ['status' => 'ready_for_delivery', 'type' => 'pickup', 'indices' => [5, 14]],
-            ['status' => 'completed', 'type' => 'dine_in', 'table' => 10, 'indices' => [6, 18]],
+            ['status' => 'completed', 'type' => 'dine_in', 'table' => $tableOccupiedB, 'indices' => [6, 18]],
         ];
 
         foreach ($samples as $sample) {
@@ -238,6 +242,9 @@ class RestaurantSeeder extends Seeder
             $order->fecha = $today;
             $order->user_id = $client->id;
             $order->order_type = $sample['type'];
+            $order->delivery_address = $sample['type'] === 'delivery'
+                ? 'Calle Reforma 45, Morelia'
+                : null;
             $order->table_id = $sample['table'] ?? null;
             $order->save();
 

@@ -9,8 +9,7 @@ use Symfony\Component\HttpFoundation\Response;
 class BlockAccessMiddleware
 {
     /**
-     * Restrict admin routes by role.
-     * 1 = admin (full access), 2/3 = staff (orders only), 0 = client (blocked).
+     * 1 = admin (todo), 2/3 = staff (órdenes + perfil), 0 = cliente (bloqueado).
      */
     public function handle(Request $request, Closure $next): Response
     {
@@ -19,25 +18,28 @@ class BlockAccessMiddleware
         }
 
         $role = (int) auth()->user()->role;
-        $path = $request->path(); // e.g. admin/orders
+        $routeName = $request->route()?->getName();
 
-        // Clients cannot access admin
         if ($role === 0) {
             return redirect('/');
         }
 
-        // Employees and delivery: only orders section
-        if ($role === 2 || $role === 3) {
-            $allowed = $path === 'admin/orders'
-                || str_starts_with($path, 'admin/orders/')
-                || $request->routeIs('orders.*');
+        if (in_array($role, [2, 3], true)) {
+            $allowedPrefixes = ['orders.', 'profile.', 'admin.home'];
+            $allowed = collect($allowedPrefixes)->contains(
+                fn ($prefix) => $routeName && str_starts_with($routeName, $prefix)
+            );
+
+            // También permitir el dashboard de admin redirigido a órdenes
+            if ($routeName === 'admin.home') {
+                return redirect()->route('orders.index');
+            }
 
             if (!$allowed) {
                 return redirect()->route('orders.index');
             }
         }
 
-        // Admins (role 1) and allowed staff continue
         return $next($request);
     }
 }

@@ -69,5 +69,7 @@ Contraseña de todos: `password`
 
 ## Notas
 
+- La tienda (`/` y `/shop`) es pública; checkout y "mis órdenes" requieren login.
 - Las imágenes de productos/categorías/sliders están en `public/images/`.
 - El dump SQL está en `database/dumps/restaurantSF.sql`.
+- El correo de confirmación usa Mailgun solo si configuras `MAILGUN_SECRET` en `.env` (si no, la orden se crea igual).

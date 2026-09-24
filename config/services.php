@@ -35,4 +35,12 @@ return [
         ],
     ],
 
+    'mailgun' => [
+        'domain' => env('MAILGUN_DOMAIN'),
+        'secret' => env('MAILGUN_SECRET'),
+        'endpoint' => env('MAILGUN_ENDPOINT', 'api.mailgun.net'),
+        'scheme' => 'https',
+        'from' => env('MAILGUN_FROM', 'San Felipe de Jesus <store@sanfelipedejesus.com>'),
+    ],
+
 ];

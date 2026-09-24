@@ -4,47 +4,38 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use App\Models\Category;
+use App\Support\ImageStorage;
 use Illuminate\Http\Request;
 
 class ProductController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        $products = Product::orderBy('id', 'desc')->paginate(2);
+        $products = Product::with('category')->orderByDesc('id')->paginate(8);
         return view('products.index', compact('products'));
     }
 
     public function display(Product $product)
     {
+        $product->load('category');
         return view('products.show', compact('product'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
-        $categories = Category::all();
-
+        $categories = Category::orderBy('name')->get();
         return view('products.create', compact('categories'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
         $this->validate($request, [
             'name' => 'required|max:255',
-            'description' => 'max:255',
-            'price' => 'required|min:0|numeric',
-            'label' => 'max:255',
-            'category' => 'required|numeric|min:0',
-            'image' => 'image|mimes:jpeg,png|max:1024|required'
-
+            'description' => 'nullable|max:255',
+            'price' => 'required|numeric|min:0',
+            'label' => 'nullable|max:255',
+            'category' => 'required|exists:categories,id',
+            'image' => 'required|image|mimes:jpeg,png,jpg,webp|max:2048',
         ]);
 
         $product = new Product();
@@ -53,118 +44,54 @@ class ProductController extends Controller
         $product->price = $request->get('price');
         $product->label = $request->get('label');
         $product->category_id = $request->get('category');
-
-        // Para el método store:
-        if ($request->hasFile('image')) {
-            $imagen = $request->file('image');
-            $nameImage = "images/products/" . uniqid() . '.' . $imagen->guessExtension();
-
-            // Ruta a la carpeta 'public/images/products'
-            $ruta = public_path("images/products/");
-
-            // Asegúrate de que el directorio exista
-            if (!file_exists($ruta)) {
-                mkdir($ruta, 0777, true); // Crea la carpeta si no existe
-            }
-
-            // Mover la imagen a la carpeta
-            $imagen->move($ruta, $nameImage);
-            $product->image = $nameImage; // Guarda el nombre de la imagen
-        }
-
+        $product->image = ImageStorage::store($request->file('image'), 'products');
         $product->save();
 
-        return redirect()->route('products.index')->with(["msg" => "Producto creado correctamente"]);
+        return redirect()->route('products.index')->with(['msg' => 'Producto creado correctamente']);
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(Product $product)
     {
-        //
+        return redirect()->route('products.display', $product);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(Product $product)
     {
-        $categories = Category::all();
-
+        $categories = Category::orderBy('name')->get();
         return view('products.edit', compact('categories', 'product'));
     }
-
-    /**
-     * Update the specified resource in storage.
-     */
-
 
     public function update(Request $request, Product $product)
     {
         $this->validate($request, [
             'name' => 'required|max:255',
-            'description' => 'max:255',
-            'price' => 'required|min:0|numeric',
-            'label' => 'max:255',
-            'category' => 'required|numeric|min:0',
-            'image' => 'image|mimes:jpeg,png|max:1024|nullable'
-
+            'description' => 'nullable|max:255',
+            'price' => 'required|numeric|min:0',
+            'label' => 'nullable|max:255',
+            'category' => 'required|exists:categories,id',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
         ]);
 
-        // $product = new Product();
         $product->name = $request->get('name');
         $product->description = $request->get('description');
         $product->price = $request->get('price');
         $product->label = $request->get('label');
         $product->category_id = $request->get('category');
 
-        // Para el método update:
         if ($request->hasFile('image')) {
-
-            // Elimina la imagen anterior si existe
-            $path = public_path() . '/' . $product->image;
-
-            if (file_exists($path) && $product->image !== null) {
-                unlink($path); // Elimina la imagen existente
-            }
-
-            // Subir la nueva imagen
-            $imagen = $request->file('image');
-            $nameImage = "images/products/" . uniqid() . '.' . $imagen->guessExtension();
-
-            // Ruta a la carpeta 'public/images/products'
-            $ruta = public_path("images/products/");
-
-            // Asegúrate de que el directorio exista
-            if (!file_exists($ruta)) {
-                mkdir($ruta, 0777, true); // Crea la carpeta si no existe
-            }
-
-            // Mover la imagen a la carpeta
-            $imagen->move($ruta, $nameImage);
-            $product->image = $nameImage; // Guarda el nombre de la imagen
+            $product->image = ImageStorage::store($request->file('image'), 'products', $product->image);
         }
 
+        $product->save();
 
-        $product->update();
-
-        return redirect()->route('products.index')->with(["msg" => "Producto editado correctamente"]);
+        return redirect()->route('products.index')->with(['msg' => 'Producto editado correctamente']);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(Product $product)
     {
-        $path = public_path() . '/' . $product->image;
-
-        if (file_exists($path) && $product->image !== null) {
-            unlink($path);
-        }
-
+        ImageStorage::delete($product->image);
         $product->delete();
 
-        return redirect()->route('products.index')->with(["msg" => "Producto eliminado correctamente"]);
+        return redirect()->route('products.index')->with(['msg' => 'Producto eliminado correctamente']);
     }
 }

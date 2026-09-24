@@ -71,6 +71,7 @@
           </tbody>
         </table>
         <!-- Paginacion -->
+        {{ $orders->links() }}
       </div>
     </div>
 

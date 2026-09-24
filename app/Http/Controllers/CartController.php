@@ -16,24 +16,27 @@ class CartController extends Controller
             'qty' => 1,
             'price' => $product->price,
             'weight' => 0,
-            'options' => ['image' => $product->image]
+            'options' => ['image' => $product->image],
         ]);
 
-        return redirect()->back()->with(['msg'=>"Producto agregado"]);
+        return redirect()->back()->with(['msg' => 'Producto agregado']);
     }
 
     public function update(Request $request, $rowId)
     {
-        $qty = $request->input('qty');
-        
-        // Actualiza la cantidad del producto en el carrito
-        Cart::instance('shopping')->update($rowId, $qty);
-        
+        $request->validate([
+            'qty' => 'required|integer|min:1|max:50',
+        ]);
+
+        Cart::instance('shopping')->update($rowId, (int) $request->input('qty'));
+
         return redirect()->back()->with(['msg' => 'Cantidad actualizada']);
     }
 
-    public function remove($rowId){
+    public function remove($rowId)
+    {
         Cart::instance('shopping')->remove($rowId);
-        return redirect()->back();
+
+        return redirect()->back()->with(['msg' => 'Producto eliminado del carrito']);
     }
 }

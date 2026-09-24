@@ -17,7 +17,7 @@
         @method('PATCH')
         <tr>
             <td>
-                <img src="{{ asset($product->options->image) }}" width="40">
+                <img src="{{ asset($product->options->image ?? 'images/no-image.jpg') }}" width="40" alt="">
             </td>
             <td>{{ $product->name }}</td>
             <td>${{ $product->price }}</td>

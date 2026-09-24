@@ -6,7 +6,7 @@
 
         <div class="card shadow">
             <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                <h3 class="m-0 font-weight-bold text-primary"> Categorias</h3>
+                <h3 class="m-0 font-weight-bold text-primary">Categorías</h3>
                 <a href="{{route('categories.create')}}" class="btn btn-primary">Crear</a>
 
             </div>
@@ -32,7 +32,10 @@
 
                             </td>
                             <td>{{$category->name}}</td>
-                            <td>{{$category->icon}}</td>
+                            <td>
+                                <span class="linearicons-{{ $category->icon }}" style="font-size: 1.4rem;"></span>
+                                <small class="d-block text-muted">{{ $category->icon }}</small>
+                            </td>
 
                             <td>
                                 <a class="btn btn-primary btn-sm" href="{{route('categories.edit',$category->id)}}">

@@ -68,7 +68,7 @@
                     </div>
 
                     <div class="col-6 text-center">
-                        <img src="{{ asset($user->image) }}" width="100">
+                        <img src="{{ asset($user->image ?: 'images/no-image.jpg') }}" width="100" alt="Avatar">
                     </div>
 
                     <div class="col-6">

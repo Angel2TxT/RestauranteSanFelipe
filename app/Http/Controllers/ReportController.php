@@ -194,10 +194,10 @@ class ReportController extends Controller
             <br>
     <!-- Detalles del usuario -->
     <p><strong>DATOS DEL USUARIO: </strong></p>
-    <p><strong>Nombre:</strong> ' . $user->name . ' ' . $user->last_name . '</p>
-    <p><strong>Email:</strong> ' . $user->email . '</p>
-    <p><strong>Dirección:</strong> ' . $user->address . '</p>
-    <p><strong>Teléfono:</strong> ' . $user->phone . '</p>
+    <p><strong>Nombre:</strong> ' . e(optional($user)->name ?? 'N/D') . ' ' . e(optional($user)->last_name ?? '') . '</p>
+    <p><strong>Email:</strong> ' . e(optional($user)->email ?? 'N/D') . '</p>
+    <p><strong>Dirección:</strong> ' . e($order->delivery_address ?: (optional($user)->address ?? 'N/D')) . '</p>
+    <p><strong>Teléfono:</strong> ' . e(optional($user)->phone ?? 'N/D') . '</p>
     <br>
 
 
@@ -212,7 +212,7 @@ class ReportController extends Controller
         <tbody>
             <tr>
                 <td class="cell-label"><strong>Cliente</strong></td>
-                <td class="cell-value">' . $order->user->name . '</td>
+                <td class="cell-value">' . e(optional($order->user)->name ?? 'N/D') . '</td>
             </tr>
             <tr>
                 <td class="cell-label"><strong>Estado</strong></td>

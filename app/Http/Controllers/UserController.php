@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Support\ImageStorage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\App;
@@ -62,31 +63,13 @@ class UserController extends Controller
         $user->password = Hash::make($request->get('password'));
 
         
-        $user->role = $request->get('role');
+        $user->role = (int) $request->get('role', 0);
 
-        
-        if ($user->role == 0 && !$request->hasFile('image')) {
-           
-            $user->image = 'images/no-image.png';  
-        } elseif ($request->hasFile('image')) {
-            
-            $path = public_path('images/users/') . $user->image;
-            
-           
-            if (file_exists($path) && $user->image !== 'images/no-image.png') {
-                unlink($path); 
-            }
-            $imagen = $request->file('image');
-            $nombreImagen = 'images/users/' . uniqid() . '.' . $imagen->guessExtension();
-            $ruta = public_path('images/users/');
-            if (!file_exists($ruta)) {
-                mkdir($ruta, 0777, true); 
-            }
-        
-            $imagen->move($ruta, $nombreImagen);
-            $user->image = $nombreImagen;
+        if ($request->hasFile('image')) {
+            $user->image = ImageStorage::store($request->file('image'), 'users');
+        } else {
+            $user->image = 'images/no-image.jpg';
         }
-        
 
         $user->save();
 
@@ -140,35 +123,13 @@ class UserController extends Controller
             $user->password = Hash::make($request->get('password'));
         }
 
-        $user->role = $request->get('role');
+        $user->role = (int) $request->get('role', $user->role);
 
-        
-        if (in_array($user->role, [0, 2, 3]) && !$request->hasFile('image')) {
-            $user->image = 'images/image.jpg';
-        } elseif ($request->hasFile('image')) {
-            $path = public_path('images/users/') . $user->image;
-            
-       
-            if (file_exists($path) && $user->image !== null) {
-                unlink($path);
-            }
-        
-            // Subir la nueva imagen
-            $imagen = $request->file('image');
-            $nombreImagen = 'images/users/' . uniqid() . '.' . $imagen->guessExtension();
-     
-            $ruta = public_path('images/users/');
-            if (!file_exists($ruta)) {
-                mkdir($ruta, 0777, true); 
-            }
-        
-            $imagen->move($ruta, $nombreImagen);
-            $user->image = $nombreImagen;
+        if ($request->hasFile('image')) {
+            $user->image = ImageStorage::store($request->file('image'), 'users', $user->image);
         }
-        
-        
 
-        $user->update();
+        $user->save();
 
         return redirect()->route('users.index')->with(['msg' => 'Usuario actualizado exitosamente.']);
     }
@@ -180,11 +141,7 @@ class UserController extends Controller
     {
         $user = User::findOrFail($id);
 
-        $path = public_path() . '/' . $user->image;
-        if (file_exists($path) && $user->image != null) {
-            unlink($path);
-        }
-
+        ImageStorage::delete($user->image);
         $user->delete();
         return redirect()->route('users.index')->with('msg', 'Usuario eliminado exitosamente.');
     }

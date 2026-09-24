@@ -3,12 +3,16 @@
 @section('content')
 
       <!-- Swiper-->
-        @include('layouts.partials.slider')
+        @if ($sliders->isNotEmpty())
+@include('layouts.partials.slider')
+@endif
       <!-- What We Offer-->
         @include('layouts.partials.categories')
 
       <!-- Section CTA-->
-        @include('layouts.partials.banner')
+        @if ($banner)
+@include('layouts.partials.banner')
+@endif
 
       <!-- Our Shop-->
         @include('layouts.partials.products-home')
