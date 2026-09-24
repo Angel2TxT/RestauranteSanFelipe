@@ -1,14 +1,73 @@
-# RestauranteSanFelipe
-Restaurante
+# Restaurante San Felipe
 
+Aplicación Laravel para pedidos de restaurante (tienda, carrito, órdenes y panel admin).
 
-1. Inatalar laragon y meter lo descargado en la carpeta 'www' la cual esta en la raiz de la carpeta de laragon, 
-de preferencia cuando instalen laragon pongan su carpeta a la vista para que sea mas facil encontrarlo
+## Requisitos
 
-2. despues inicializar la base de datos
+- PHP 8.2+
+- Composer
+- MySQL 8 (Laragon recomendado)
+- Node.js (opcional, solo si rebuild de Vite)
 
-3. luego migrar con el comando "php asrtisan migrate", poner yes para crear la base de datos
+## Instalación rápida (con dump SQL)
 
-4. Iniciar con "php artisan serve"
+1. Clona el proyecto y entra a la carpeta.
+2. Copia el entorno e instala dependencias:
 
-5. y el el navegador, de acuerdo como se llame la carpeta, que es restaurant, poner restaurant.test y restaurant.test/home/admin
+```bash
+copy .env.example .env
+composer install
+php artisan key:generate
+```
+
+3. Configura MySQL en `.env`:
+
+```env
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=restaurantSF
+DB_USERNAME=root
+DB_PASSWORD=
+```
+
+4. Importa la base de datos completa (estructura + datos de demo):
+
+```bash
+mysql -u root < database/dumps/restaurantSF.sql
+```
+
+En Laragon / Windows también puedes importar `database/dumps/restaurantSF.sql` desde HeidiSQL o phpMyAdmin.
+
+5. Arranca el servidor:
+
+```bash
+php artisan serve
+```
+
+Abre: http://127.0.0.1:8000
+
+## Alternativa sin dump (migraciones + seed)
+
+```bash
+php artisan migrate --seed
+```
+
+## Usuarios de demostración
+
+Contraseña de todos: `password`
+
+| Rol | Email |
+|-----|--------|
+| Admin | admin@sanfelipe.test |
+| Cliente | cliente@sanfelipe.test |
+| Empleado | empleado@sanfelipe.test |
+| Repartidor | repartidor@sanfelipe.test |
+
+- Tienda: http://127.0.0.1:8000/login
+- Admin: http://127.0.0.1:8000/admin/home
+
+## Notas
+
+- Las imágenes de productos/categorías/sliders están en `public/images/`.
+- El dump SQL está en `database/dumps/restaurantSF.sql`.

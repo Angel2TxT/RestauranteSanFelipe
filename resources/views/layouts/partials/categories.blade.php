@@ -9,7 +9,7 @@
                         <!-- Services Terri-->
                         <article class="services-terri wow slideInUp">
                             <div class="services-terri-figure">
-                              <img src="{{$category->image}}" alt="{{$category->name}}"
+                              <img src="{{ asset($category->image) }}" alt="{{$category->name}}"
                                     width="370" height="278" />
                             </div>
                             <div class="services-terri-caption">

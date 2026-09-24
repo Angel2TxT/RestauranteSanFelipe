@@ -1,4 +1,4 @@
-<section class="primary-overlay section parallax-container" data-parallax-img="{{ $banner->image }}">
+<section class="primary-overlay section parallax-container" data-parallax-img="{{ asset($banner->image) }}">
     <div class="parallax-content section-xl context-dark text-md-left">
         <div class="container">
             <div class="row justify-content-start">
