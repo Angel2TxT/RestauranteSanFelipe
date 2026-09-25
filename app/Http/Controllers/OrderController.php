@@ -5,12 +5,16 @@ namespace App\Http\Controllers;
 use App\Models\Item;
 use App\Models\Order;
 use App\Models\Table;
+use App\Models\User;
+use App\Notifications\OrderCreated;
+use App\Notifications\OrderStatusChanged;
 use App\Services\Mailing;
 use Carbon\Carbon;
 use Gloudemans\Shoppingcart\Facades\Cart;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Notification;
 
 class OrderController extends Controller
 {
@@ -123,7 +127,26 @@ class OrderController extends Controller
 
         Cart::instance('shopping')->destroy();
 
-        return redirect()->route('orders.my')->with(['msg' => 'Orden creada correctamente.']);
+        try {
+            $staff = User::query()
+                ->whereIn('role', [1, 2, 3])
+                ->get();
+
+            if ($staff->isNotEmpty()) {
+                Notification::send($staff, new OrderCreated($order));
+            }
+        } catch (\Throwable $e) {
+            Log::warning('Orden creada pero la notificación interna falló: ' . $e->getMessage());
+        }
+
+        $itemsCount = $order->items->sum(fn ($item) => (int) ($item->pivot->qty ?? 1));
+
+        return redirect()->route('orders.my')->with('order_placed', [
+            'id' => $order->id,
+            'total' => number_format((float) $order->total, 2),
+            'count' => $itemsCount,
+            'type' => $order->order_type,
+        ]);
     }
 
     public function myOrders()
@@ -141,6 +164,7 @@ class OrderController extends Controller
     {
         $statusFlow = ['pending', 'in_progress', 'ready_for_delivery', 'paid', 'completed'];
         $currentIndex = array_search($order->status, $statusFlow, true);
+        $previousStatus = $order->status;
 
         if ($currentIndex !== false && $currentIndex < count($statusFlow) - 1) {
             $order->status = $statusFlow[$currentIndex + 1];
@@ -153,6 +177,14 @@ class OrderController extends Controller
                     $table->save();
                 }
             }
+
+            try {
+                if ($order->user) {
+                    $order->user->notify(new OrderStatusChanged($order, $previousStatus));
+                }
+            } catch (\Throwable $e) {
+                Log::warning('Estado actualizado pero la notificación falló: ' . $e->getMessage());
+            }
         }
 
         return redirect()->back()->with(['msg' => 'Estado de la orden actualizado']);
@@ -160,12 +192,27 @@ class OrderController extends Controller
 
     public function revertStatus(Order $order)
     {
+        $previousStatus = $order->status;
+        $changed = false;
+
         if ($order->status === 'ready_for_delivery') {
             $order->status = 'in_progress';
             $order->save();
+            $changed = true;
         } elseif ($order->status === 'paid') {
             $order->status = 'ready_for_delivery';
             $order->save();
+            $changed = true;
+        }
+
+        if ($changed) {
+            try {
+                if ($order->user) {
+                    $order->user->notify(new OrderStatusChanged($order, $previousStatus));
+                }
+            } catch (\Throwable $e) {
+                Log::warning('Estado revertido pero la notificación falló: ' . $e->getMessage());
+            }
         }
 
         return redirect()->back()->with(['msg' => 'Estado de la orden revertido']);

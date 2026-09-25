@@ -6,7 +6,7 @@
                     <div class="cta-modern">
                         <h3 class="cta-modern-title wow fadeInRight">{{ $banner->title }}</h3>
                         <p class="lead">{{ $banner->description }}</p>
-                        <a class="button button-md button-secondary-2 button-winona wow fadeInUp"
+                        <a class="button button-sm button-secondary-2 button-winona wow fadeInUp"
                             href="{{ $banner->link }}" data-wow-delay=".2s">{{ $banner->text_link }}</a>
                     </div>
                 </div>

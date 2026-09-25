@@ -10,6 +10,7 @@ use App\Http\Controllers\SliderController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Middleware\BlockAccessMiddleware;
 
 Auth::routes();
@@ -29,6 +30,10 @@ Route::middleware('auth')->group(function () {
     Route::get('order/checkout', [OrderController::class, 'checkout'])->name('orders.checkout');
     Route::post('order/proccess-checkout', [OrderController::class, 'proccesCheckout'])->name('orders.proccess.checkout');
     Route::get('my-orders', [OrderController::class, 'myOrders'])->name('orders.my');
+
+    Route::get('notifications', [NotificationController::class, 'index'])->name('notifications.index');
+    Route::post('notifications/read-all', [NotificationController::class, 'markAllAsRead'])->name('notifications.read-all');
+    Route::post('notifications/{id}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');
 });
 
 Route::prefix('admin')->middleware(['auth', BlockAccessMiddleware::class])->group(function () {

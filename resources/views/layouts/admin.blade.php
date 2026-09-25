@@ -7,6 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description" content="">
     <meta name="author" content="">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <title>Administración</title>
 
@@ -147,6 +148,24 @@
 
                     <!-- Topbar Navbar -->
                     <ul class="navbar-nav ml-auto">
+                        <li class="nav-item dropdown no-arrow mx-1" id="sf-notify">
+                            <a class="nav-link dropdown-toggle" href="#" id="sf-notify-toggle" role="button"
+                                aria-haspopup="true" aria-expanded="false" aria-controls="sf-notify-panel">
+                                <i class="fas fa-bell fa-fw"></i>
+                                <span class="badge badge-danger badge-counter sf-notify-badge is-empty" id="sf-notify-badge" hidden>0</span>
+                            </a>
+                            <div class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in sf-admin-notify-panel"
+                                id="sf-notify-panel" aria-labelledby="sf-notify-toggle" style="display:none;">
+                                <h6 class="dropdown-header d-flex align-items-center justify-content-between">
+                                    <span>Notificaciones</span>
+                                    <button type="button" class="btn btn-sm btn-link p-0 text-white" id="sf-notify-readall">Marcar todas</button>
+                                </h6>
+                                <div id="sf-notify-list">
+                                    <span class="dropdown-item text-center small text-gray-500 sf-notify-empty">Sin notificaciones</span>
+                                </div>
+                            </div>
+                        </li>
+
                         <div class="topbar-divider d-none d-sm-block"></div>
 
                         <!-- Nav Item - User Information -->
@@ -277,6 +296,8 @@
             }
         });
     </script>
+
+    <script src="{{ asset('js/notifications.js') }}?v={{ filemtime(public_path('js/notifications.js')) }}"></script>
 
 </body>
 

@@ -1,52 +1,59 @@
 @extends('layouts.default')
 
 @section('content')
-
-
-
-<section class="bg-gray-7">
-    <div class="breadcrumbs-custom box-transform-wrap context-dark">
-      <div class="container">
-        <h3 class="breadcrumbs-custom-title">Productos</h3>
-        <div class="breadcrumbs-custom-decor"></div>
-      </div>
-      <div class="box-transform" style="background-image: url({{asset('images/bg-1.jpg')}});"></div>
-    </div>
+<section class="product-page">
+  <div class="product-hero" style="background-image: linear-gradient(120deg, rgba(70, 50, 138, 0.92), rgba(21, 21, 21, 0.55)), url({{ asset($product->image ?: 'images/bg-1.jpg') }});">
     <div class="container">
-      <ul class="breadcrumbs-custom-path">
-        <li><a href="{{route('home')}}">Inicio</a></li>
-        <li class="active"><a href="{{route('home')}}">Productos</a></li>
-        <li class="active"><a href="#">Ver</a></li>
-      </ul>
-    </div>
-  </section>
-
-  <div class="container">
-    <div class="row">
-      <div class="col-md-5 offset-md-4 ">
-        <div class="card mt-4 mb-4">
-          <div class="card-header">
-            <h6 class="m-0 font-weight-bold text-primary"> Ver producto</h6>
-          </div>
-          <div class="card-body">
-
-            <div class="card ml-2">
-              <img src="{{asset($product->image)}}" class="card-img-top">
-              <div class="card-body">
-                <h5 class="card-title">{{$product->name}}</h5>
-                <h3 class="card-title">${{$product->price}}</h3>
-                <p class="card-text">
-                    {{$product->description}}
-                </p>
-                <a href="{{route('cart.add',$product)}}" class="btn btn-primary mt-4">Agregar al carrito</a>
-              </div>
-            </div>
-          </div>
-
-        </div>
-
-      </div>
+      <nav class="product-breadcrumbs" aria-label="Breadcrumb">
+        <a href="{{ route('home') }}">Inicio</a>
+        <span>/</span>
+        <a href="{{ route('shop') }}">Productos</a>
+        @if ($product->category)
+          <span>/</span>
+          <a href="{{ route('shop', ['category' => $product->category_id]) }}">{{ $product->category->name }}</a>
+        @endif
+        <span>/</span>
+        <strong>{{ $product->name }}</strong>
+      </nav>
     </div>
   </div>
 
+  <div class="product-body">
+    <div class="container">
+      <div class="product-detail">
+        <div class="product-detail__media">
+          <img src="{{ asset($product->image ?: 'images/no-image.jpg') }}" alt="{{ $product->name }}">
+        </div>
+
+        <div class="product-detail__info">
+          @if ($product->category)
+            <a class="product-detail__category" href="{{ route('shop', ['category' => $product->category_id]) }}">
+              {{ $product->category->name }}
+            </a>
+          @endif
+
+          <h1 class="product-detail__title">{{ $product->name }}</h1>
+          <div class="product-detail__price">${{ number_format((float) $product->price, 2) }}</div>
+
+          <p class="product-detail__text">
+            {{ $product->description ?: 'Sin descripción disponible.' }}
+          </p>
+
+          <div class="product-detail__actions">
+            <a
+              href="{{ route('cart.add', $product) }}"
+              data-url="{{ route('cart.add', $product) }}"
+              class="product-detail__btn product-detail__btn--primary js-add-to-cart"
+            >
+              Agregar al carrito
+            </a>
+            <a href="{{ route('shop') }}" class="product-detail__btn product-detail__btn--ghost">
+              Volver al menú
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 @endsection

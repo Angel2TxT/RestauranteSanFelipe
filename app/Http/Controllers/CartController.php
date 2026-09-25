@@ -8,7 +8,7 @@ use Gloudemans\Shoppingcart\Facades\Cart;
 
 class CartController extends Controller
 {
-    public function add(Product $product)
+    public function add(Request $request, Product $product)
     {
         Cart::instance('shopping')->add([
             'id' => $product->id,
@@ -19,7 +19,7 @@ class CartController extends Controller
             'options' => ['image' => $product->image],
         ]);
 
-        return redirect()->back()->with(['msg' => 'Producto agregado']);
+        return $this->cartResponse($request, 'Producto agregado');
     }
 
     public function update(Request $request, $rowId)
@@ -30,13 +30,28 @@ class CartController extends Controller
 
         Cart::instance('shopping')->update($rowId, (int) $request->input('qty'));
 
-        return redirect()->back()->with(['msg' => 'Cantidad actualizada']);
+        return $this->cartResponse($request, 'Cantidad actualizada');
     }
 
-    public function remove($rowId)
+    public function remove(Request $request, $rowId)
     {
         Cart::instance('shopping')->remove($rowId);
 
-        return redirect()->back()->with(['msg' => 'Producto eliminado del carrito']);
+        return $this->cartResponse($request, 'Producto eliminado del carrito');
+    }
+
+    private function cartResponse(Request $request, string $message)
+    {
+        if ($request->expectsJson() || $request->ajax()) {
+            return response()->json([
+                'ok' => true,
+                'message' => $message,
+                'count' => Cart::instance('shopping')->content()->count(),
+                'qty_total' => Cart::instance('shopping')->count(),
+                'cart_html' => view('layouts.partials.cart-panel')->render(),
+            ]);
+        }
+
+        return redirect()->back()->with(['msg' => $message]);
     }
 }

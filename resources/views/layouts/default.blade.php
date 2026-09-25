@@ -6,12 +6,13 @@
     <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta charset="utf-8">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="icon" href="{{asset('images/favicon.ico')}}" type="image/x-icon">
     <!-- Stylesheets-->
     <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Roboto:100,300,300i,400,500,600,700,900%7CRaleway:500">
     <link rel="stylesheet" href="{{asset('css/bootstrap.css')}}">
     <link rel="stylesheet" href="{{asset('css/fonts.css')}}">
-    <link rel="stylesheet" href="{{asset('css/style.css')}}">
+    <link rel="stylesheet" href="{{asset('css/style.css')}}?v={{ filemtime(public_path('css/style.css')) }}">
 
   </head>
   <body>
@@ -23,6 +24,8 @@
         <!-- Page Header-->
         @include('layouts.partials.header')
 
+        <div id="ajax-toast" class="ajax-toast" hidden></div>
+
         @if (session()->has('msg'))
             <div class="alert alert-success alert-dismissible fade show mt-4" role="alert" style="background-color: green; color:white">
                 <strong>Mensaje!</strong> {{ session('msg') }}
@@ -32,8 +35,9 @@
             </div>
         @endif
 
-
-      @yield('content')
+      <main class="page-main">
+        @yield('content')
+      </main>
 
       <!-- Page Footer-->
       <footer class="section footer-modern context-dark footer-modern-2">
@@ -43,7 +47,7 @@
             <div class="row row-30 align-items-center">
               <div class="col-sm-6 col-md-7 col-lg-4 col-xl-4">
                 <div class="row row-30 align-items-center text-lg-center">
-                  <div class="col-md-7 col-xl-8"><a class="brand" href="/"><img src="images/logoSFW.png" alt="Logo" width="198" height="66"/></a></div>
+                  <div class="col-md-7 col-xl-8"><a class="brand" href="{{ route('home') }}"><img src="{{ asset('images/logoSFW.png') }}" alt="Restaurante San Felipe" width="198" height="66"/></a></div>
                   
                 </div>
               </div>
@@ -103,6 +107,10 @@
     <!-- Javascript-->
     <script src="{{asset('js/core.min.js')}}"></script>
     <script src="{{asset('js/script.js')}}"></script>
+    <script src="{{asset('js/ajax-app.js')}}?v={{ filemtime(public_path('js/ajax-app.js')) }}"></script>
+    @auth
+      <script src="{{asset('js/notifications.js')}}?v={{ filemtime(public_path('js/notifications.js')) }}"></script>
+    @endauth
     <!-- coded by Himic-->
   </body>
 </html>

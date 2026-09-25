@@ -34,8 +34,12 @@ class HomeController extends Controller
             ->when($search, fn ($query) => $query->where('name', 'like', '%' . $search . '%'))
             ->when($sort, fn ($query) => $query->orderBy('price', $sort))
             ->orderByDesc('id')
-            ->paginate(8)
+            ->paginate(50)
             ->withQueryString();
+
+        if ($request->ajax() || $request->boolean('ajax')) {
+            return view('shop._products', compact('products'));
+        }
 
         return view('shop', compact('products', 'categories'));
     }

@@ -1,99 +1,86 @@
 @extends('layouts.default')
 
 @section('content')
+@php
+  $total = $products->total();
+  $hasFilters = request()->filled('search') || request()->filled('category') || request()->filled('sort');
+@endphp
 
-<section class="bg-gray-7">
-    <div class="breadcrumbs-custom box-transform-wrap context-dark">
-        <div class="container">
-            <h3 class="breadcrumbs-custom-title">Productos</h3>
-            <div class="breadcrumbs-custom-decor"></div>
+<section class="shop-page">
+  <div class="shop-hero" style="background-image: linear-gradient(120deg, rgba(70, 50, 138, 0.92), rgba(21, 21, 21, 0.55)), url({{ asset('images/bg-1.jpg') }});">
+    <div class="container">
+      <nav class="shop-breadcrumbs" aria-label="Breadcrumb">
+        <a href="{{ route('home') }}">Inicio</a>
+        <span>/</span>
+        <strong>Productos</strong>
+      </nav>
+
+      <div class="shop-hero-content">
+        <div class="shop-hero-text">
+          <h1 class="shop-hero-title">Productos</h1>
+          <p class="shop-hero-meta" id="shop-hero-meta">
+            {{ $total }}
+            {{ $total === 1 ? 'platillo disponible' : 'platillos disponibles' }}
+            @if ($hasFilters)
+              · filtros activos
+            @endif
+          </p>
         </div>
-        <div class="box-transform" style="background-image: url(images/bg-1.jpg);"></div>
+        <a class="shop-hero-cta" href="{{ route('home') }}#menu">Ver categorías</a>
+      </div>
     </div>
+  </div>
+
+  <div class="shop-body">
     <div class="container">
-        <ul class="breadcrumbs-custom-path">
-            <li><a href="#">Inicio</a></li>
-            <li class="active"><a href="#">Productos</a></li>
-        </ul>
-    </div>
-</section>
+      <form method="GET" action="{{ route('shop') }}" id="shop-form" class="shop-filters-box" data-ajax-shop>
+        <div class="shop-filters-row">
+          <div class="shop-filters-item shop-filters-item--sort">
+            <label class="shop-filters-label" for="shop-sort">Ordenar</label>
+            <select id="shop-sort" name="sort" class="shop-filters-input js-native-select">
+              <option value="">Por precio</option>
+              <option value="asc" {{ request('sort') == 'asc' ? 'selected' : '' }}>Menor precio</option>
+              <option value="desc" {{ request('sort') == 'desc' ? 'selected' : '' }}>Mayor precio</option>
+            </select>
+          </div>
 
+          <div class="shop-filters-item shop-filters-item--category">
+            <label class="shop-filters-label" for="shop-category">Categoría</label>
+            <select id="shop-category" name="category" class="shop-filters-input js-native-select">
+              <option value="">Todas</option>
+              @foreach ($categories as $category)
+                <option value="{{ $category->id }}" {{ (string) request('category') === (string) $category->id ? 'selected' : '' }}>
+                  {{ $category->name }}
+                </option>
+              @endforeach
+            </select>
+          </div>
 
-<!-- Formulario de búsqueda, filtro y ordenar -->
-<section class="section section-lg bg-default">
-    <div class="container">
-        <form method="GET" action="{{ route('shop') }}" id="shop-form">
-            <div class="row justify-content-center">
-
-              <!-- Ordenar por precio -->
-              <div class="col-md-2 mr-5">
-                <select name="sort" class="form-control custom-select" onblur="submitForm()">
-                    <option value="">Ordenar por precio</option>
-                    <option value="asc" {{ request('sort') == 'asc' ? 'selected' : '' }}>Menor precio</option>
-                    <option value="desc" {{ request('sort') == 'desc' ? 'selected' : '' }}>Mayor precio</option>
-                </select>
+          <div class="shop-filters-item shop-filters-item--search">
+            <label class="shop-filters-label" for="shop-search">Buscar</label>
+            <div class="shop-filters-search">
+              <input
+                id="shop-search"
+                type="search"
+                name="search"
+                class="shop-filters-input"
+                placeholder="Buscar producto..."
+                value="{{ request('search') }}"
+                autocomplete="off"
+              >
+              <button class="shop-filters-btn shop-filters-btn--icon" type="submit" aria-label="Buscar">
+                <i class="fas fa-search"></i>
+              </button>
+              <a class="shop-filters-btn shop-filters-btn--text" href="{{ route('shop') }}" id="shop-clear">Limpiar</a>
             </div>
-              
-                <!-- Filtro por categoría -->
-                <div class="col-md-2 ml-3 mr-5">
-                    <select name="category" class="form-control custom-select" >
-                        <option value="">Filtrar por categoría</option>
-                        @foreach ($categories as $category)
-                            <option value="{{ $category->id }}" {{ request('category') == $category->id ? 'selected' : '' }}>
-                                {{ $category->name }}
-                            </option>
-                        @endforeach
-                    </select>
-                </div>
-
-                <!-- Buscador de productos -->
-                <div class="col-md-6 ml-3 ">
-                    <div class="input-group">
-                        <input type="text" name="search" class="form-control" placeholder="Buscar producto..." value="{{ request('search') }}" onblur="submitForm()" />
-                        <div class="input-group-append">
-                            <button class="btn btn-primary ml-2 btn-lg" type="submit">
-                              
-                                <i class="fas fa-search"></i>
-                            </button>
-                            <button  class="btn btn-primary btn-md" onclick="clearSearch()">Limpiar</button>
-                        </div>
-                    </div>
-                </div>
-
-                
-
-                
-            </div>
-        </form>
-    </div>
-</section>
-
-<!-- Productos -->
-<section class="section section-lg bg-default">
-    <div class="container">
-        <div class="row row-lg row-30">
-            @foreach ($products as $product)
-                <x-product :$product />
-            @endforeach
+          </div>
         </div>
-        <div class="mt-4">
-            {{$products->links()}} <!-- Paginación -->
-        </div>
-    </div>
-</section>
+      </form>
 
+      <div id="shop-results" class="shop-results">
+        @include('shop._products')
+      </div>
+    </div>
+  </div>
+</section>
 @endsection
-
-
-<script>
-    // Función para limpiar los campos de búsqueda
-    function clearSearch() {
-        // Limpiar el campo de búsqueda y el filtro de categoría
-        document.querySelector('input[name="search"]').value = '';
-        document.querySelector('select[name="category"]').value = '';
-        document.querySelector('select[name="sort"]').value = '';
-
-        // Volver a cargar la página sin parámetros de búsqueda
-        document.getElementById('shop-form').submit();
-    }
-</script>

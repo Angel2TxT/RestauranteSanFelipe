@@ -39,7 +39,14 @@ class CategoryController extends Controller
     public function show(Category $category)
     {
         $category->load(['products' => fn ($q) => $q->latest('id')]);
-        return view('categories.show', compact('category'));
+
+        $otherCategories = Category::query()
+            ->where('id', '!=', $category->id)
+            ->orderBy('name')
+            ->take(4)
+            ->get();
+
+        return view('categories.show', compact('category', 'otherCategories'));
     }
 
     public function edit(Category $category)

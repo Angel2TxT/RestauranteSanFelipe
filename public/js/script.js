@@ -24,7 +24,7 @@
 				rdMailForm: $(".rd-mailform"),
 				rdInputLabel: $(".form-label"),
 				regula: $("[data-constraints]"),
-				selectFilter: $("select"),
+				selectFilter: $("select").not(".js-native-select"),
 				wow: $(".wow"),
 				owl: $(".owl-carousel"),
 				swiper: $(".swiper-slider"),
