@@ -7,14 +7,100 @@
   function toast(message, isError) {
     var el = document.getElementById('ajax-toast');
     if (!el) return;
-    el.textContent = message;
+    var msg = el.querySelector('.ajax-toast__msg');
+    var icon = el.querySelector('.ajax-toast__icon');
+    if (msg) {
+      msg.textContent = message;
+    } else {
+      el.textContent = message;
+    }
+    if (icon) {
+      icon.innerHTML = isError
+        ? '<i class="fas fa-times"></i>'
+        : '<i class="fas fa-check"></i>';
+    }
     el.classList.toggle('is-error', !!isError);
+    el.classList.toggle('is-success', !isError);
     el.hidden = false;
+    el.classList.remove('is-in', 'is-out');
+    void el.offsetWidth;
+    el.classList.add('is-in');
     clearTimeout(toast._timer);
+    clearTimeout(toast._hide);
     toast._timer = setTimeout(function () {
-      el.hidden = true;
-    }, 2400);
+      el.classList.remove('is-in');
+      el.classList.add('is-out');
+      toast._hide = setTimeout(function () {
+        el.hidden = true;
+        el.classList.remove('is-out', 'is-success', 'is-error');
+      }, 280);
+    }, 3000);
   }
+
+  function askConfirm(options) {
+    options = options || {};
+    var root = document.getElementById('sf-confirm');
+    if (!root) {
+      return Promise.resolve(window.confirm(options.text || '¿Continuar?'));
+    }
+
+    var titleEl = document.getElementById('sf-confirm-title');
+    var textEl = document.getElementById('sf-confirm-text');
+    var okBtn = document.getElementById('sf-confirm-ok');
+    var iconEl = root.querySelector('.sf-confirm__icon i');
+
+    if (titleEl) titleEl.textContent = options.title || '¿Continuar?';
+    if (textEl) textEl.textContent = options.text || '';
+    if (okBtn) okBtn.textContent = options.confirmLabel || 'Sí, confirmar';
+    if (iconEl) {
+      iconEl.className = options.icon || 'fas fa-exclamation';
+    }
+    root.classList.toggle('is-danger', options.danger !== false);
+
+    return new Promise(function (resolve) {
+      function cleanup(result) {
+        root.classList.remove('is-open');
+        root.classList.add('is-closing');
+        document.body.classList.remove('sf-confirm-open');
+        document.removeEventListener('keydown', onKey);
+        setTimeout(function () {
+          root.hidden = true;
+          root.classList.remove('is-closing');
+          root._resolve = null;
+          resolve(result);
+        }, 220);
+      }
+
+      function onKey(event) {
+        if (event.key === 'Escape') cleanup(false);
+        if (event.key === 'Enter') cleanup(true);
+      }
+
+      root._resolve = cleanup;
+      root.hidden = false;
+      document.body.classList.add('sf-confirm-open');
+      requestAnimationFrame(function () {
+        root.classList.add('is-open');
+        if (okBtn) okBtn.focus();
+      });
+      document.addEventListener('keydown', onKey);
+    });
+  }
+
+  document.addEventListener('click', function (event) {
+    var root = document.getElementById('sf-confirm');
+    if (!root || root.hidden || typeof root._resolve !== 'function') return;
+
+    if (event.target.closest('[data-sf-confirm-dismiss]')) {
+      event.preventDefault();
+      root._resolve(false);
+      return;
+    }
+    if (event.target.closest('#sf-confirm-ok')) {
+      event.preventDefault();
+      root._resolve(true);
+    }
+  });
 
   function updateCartUI(data) {
     var count = document.getElementById('cart-count');
@@ -153,6 +239,158 @@
       .catch(function () {
         toast('No se pudo eliminar el producto', true);
       });
+  });
+
+  function updateOrderQty(input) {
+    var url = input.getAttribute('data-url');
+    if (!url) return;
+    var qty = parseInt(input.value, 10) || 1;
+    var body = new URLSearchParams();
+    body.set('qty', String(qty));
+    body.set('_method', 'PATCH');
+
+    fetch(url, {
+      method: 'POST',
+      headers: {
+        'X-CSRF-TOKEN': csrfToken,
+        'X-Requested-With': 'XMLHttpRequest',
+        'Accept': 'application/json'
+      },
+      credentials: 'same-origin',
+      body: body
+    })
+      .then(function (response) {
+        return response.json().then(function (data) {
+          if (!response.ok || data.ok === false) {
+            throw new Error(data.message || 'error');
+          }
+          return data;
+        });
+      })
+      .then(function (data) {
+        toast(data.message || 'Cantidad actualizada');
+        window.location.href = data.redirect || window.location.href;
+      })
+      .catch(function (err) {
+        toast((err && err.message) || 'No se pudo actualizar', true);
+      });
+  }
+
+  document.addEventListener('change', function (event) {
+    var input = event.target.closest('.js-order-qty');
+    if (!input) return;
+    updateOrderQty(input);
+  });
+
+  document.addEventListener('click', function (event) {
+    var btn = event.target.closest('.js-order-qty-step');
+    if (!btn) return;
+    event.preventDefault();
+    var wrap = btn.closest('.order-qty');
+    if (!wrap) return;
+    var input = wrap.querySelector('.js-order-qty');
+    if (!input) return;
+    var step = parseInt(btn.getAttribute('data-step'), 10) || 0;
+    var min = parseInt(input.getAttribute('min'), 10) || 1;
+    var max = parseInt(input.getAttribute('max'), 10) || 50;
+    var next = Math.min(max, Math.max(min, (parseInt(input.value, 10) || 1) + step));
+    input.value = String(next);
+    updateOrderQty(input);
+  });
+
+  document.addEventListener('click', function (event) {
+    var btn = event.target.closest('.js-order-item-remove');
+    if (!btn) return;
+    event.preventDefault();
+    var url = btn.getAttribute('data-url');
+    if (!url) return;
+
+    askConfirm({
+      title: 'Quitar producto',
+      text: 'Este platillo se eliminará de tu orden pendiente.',
+      confirmLabel: 'Sí, quitar',
+      icon: 'fas fa-trash-alt',
+      danger: true
+    }).then(function (ok) {
+      if (!ok) return;
+
+      fetch(url, {
+        method: 'POST',
+        headers: {
+          'X-CSRF-TOKEN': csrfToken,
+          'X-Requested-With': 'XMLHttpRequest',
+          'Accept': 'application/json'
+        },
+        credentials: 'same-origin',
+        body: new URLSearchParams({ _method: 'DELETE' })
+      })
+        .then(function (response) {
+          return response.json().then(function (data) {
+            if (!response.ok || data.ok === false) {
+              throw new Error(data.message || 'error');
+            }
+            return data;
+          });
+        })
+        .then(function (data) {
+          toast(data.message || 'Producto eliminado');
+          window.location.href = data.redirect || window.location.href;
+        })
+        .catch(function (err) {
+          toast((err && err.message) || 'No se pudo eliminar', true);
+        });
+    });
+  });
+
+  document.addEventListener('submit', function (event) {
+    var form = event.target.closest('.js-order-cancel-form, .js-order-merge-form');
+    if (!form) return;
+    event.preventDefault();
+
+    var proceed = Promise.resolve(true);
+    if (form.classList.contains('js-order-cancel-form')) {
+      proceed = askConfirm({
+        title: 'Cancelar pedido',
+        text: 'Se cancelará tu orden pendiente y no se podrá recuperar.',
+        confirmLabel: 'Sí, cancelar',
+        icon: 'fas fa-ban',
+        danger: true
+      });
+    }
+
+    proceed.then(function (ok) {
+      if (!ok) return;
+
+      fetch(form.getAttribute('action'), {
+        method: 'POST',
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest',
+          'Accept': 'application/json',
+          'X-CSRF-TOKEN': csrfToken
+        },
+        credentials: 'same-origin',
+        body: new FormData(form)
+      })
+        .then(function (response) {
+          return response.json().then(function (data) {
+            if (!response.ok || data.ok === false) {
+              throw new Error(data.message || 'error');
+            }
+            return data;
+          });
+        })
+        .then(function (data) {
+          toast(data.message || 'Listo');
+          if (data.redirect) {
+            window.location.href = data.redirect;
+          } else {
+            window.location.reload();
+          }
+        })
+        .catch(function (err) {
+          toast((err && err.message) || 'No se pudo completar la acción', true);
+        });
+    });
   });
 
   // Giro de cards (delegado, funciona tras AJAX)

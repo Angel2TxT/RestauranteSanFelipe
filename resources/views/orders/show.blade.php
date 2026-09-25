@@ -1,185 +1,174 @@
 @extends('layouts.admin')
 
+@section('title', 'Orden #' . $order->id)
+@section('page_title', 'Órdenes')
+
 @section('content')
-    @php
-        $statusClass = match ($order->status) {
-            'pending' => 'btn-danger',
-            'in_progress' => 'btn-warning',
-            'ready_for_delivery' => 'btn-primary',
-            'paid' => 'btn-success',
-            'completed' => 'btn-secondary',
-            default => 'btn-light',
-        };
+@php
+    $flow = ['pending', 'in_progress', 'ready_for_delivery', 'paid', 'completed'];
+    $stepIndex = array_search($order->status, $flow, true);
+    $cancelled = in_array($order->status, ['cancelled_by_user', 'cancelled_by_store'], true);
 
-        $statusLabel = match ($order->status) {
-            'pending' => 'Comenzar pedido',
-            'in_progress' => 'Pedido en preparación',
-            'ready_for_delivery' => 'Listo para entrega',
-            'paid' => 'Recibir pago',
-            'completed' => 'Pedido completado',
-            default => $order->status,
-        };
+    $badgeClass = match ($order->status) {
+        'pending' => 'sf-badge--pending',
+        'in_progress' => 'sf-badge--progress',
+        'ready_for_delivery' => 'sf-badge--ready',
+        'paid' => 'sf-badge--paid',
+        'completed' => 'sf-badge--done',
+        default => 'sf-badge--cancelled',
+    };
 
-        $badgeLabel = match ($order->status) {
-            'pending' => 'Orden pendiente',
-            'in_progress' => 'Orden en proceso',
-            'ready_for_delivery' => 'Orden lista para entrega',
-            'paid' => 'Recibir pago',
-            'completed' => 'Orden completada',
-            default => $order->status,
-        };
-    @endphp
+    $badgeLabel = match ($order->status) {
+        'pending' => 'Pendiente',
+        'in_progress' => 'En preparación',
+        'ready_for_delivery' => 'Lista para entrega',
+        'paid' => 'Por cobrar',
+        'completed' => 'Completada',
+        'cancelled_by_user' => 'Cancelada por el cliente',
+        'cancelled_by_store' => 'Cancelada por el restaurante',
+        default => $order->status,
+    };
 
-    <div class="card shadow mb-4">
-        <div class="card-header py-3 d-flex flex-column flex-sm-row align-items-center justify-content-between">
-            <h3 class="m-0 font-weight-bold text-primary mb-2 mb-sm-0">
-                Orden #{{ $order->id }}
-                <span class="badge {{ $order->status === 'pending' ? 'badge-danger' : 'badge-success' }}"
-                    style="padding: 5px; border-radius: 5px;">{{ $badgeLabel }}</span>
-            </h3>
+    $statusAction = match ($order->status) {
+        'pending' => ['label' => 'Comenzar pedido', 'class' => 'sf-btn-cta sf-btn-cta--start'],
+        'in_progress' => ['label' => 'Marcar como lista', 'class' => 'sf-btn-cta sf-btn-cta--progress'],
+        'ready_for_delivery' => ['label' => 'Entregar / cobrar', 'class' => 'sf-btn-cta sf-btn-cta--ready'],
+        'paid' => ['label' => 'Completar orden', 'class' => 'sf-btn-cta sf-btn-cta--paid'],
+        default => null,
+    };
 
-            <div class="d-flex flex-column flex-sm-row align-items-end mt-3 mt-sm-0">
-                <a href="{{ route('orders.index') }}" class="btn btn-primary mb-2 mb-sm-0 mr-sm-2">Regresar</a>
+    $tipo = match ($order->order_type) {
+        'dine_in' => 'En mesa' . ($order->table ? ' · ' . $order->table->name : ''),
+        'delivery' => 'A domicilio',
+        'pickup' => 'Para llevar',
+        default => $order->order_type,
+    };
 
-                @if ($order->status === 'completed')
-                    <button type="button" class="btn btn-sm {{ $statusClass }} mb-2 mb-sm-0" disabled>
-                        {{ $statusLabel }}
-                    </button>
-                @else
-                    <form action="{{ route('orders.status', $order) }}" method="POST" class="mb-2 mb-sm-0 status-form"
-                        data-confirm="{{ in_array($order->status, ['ready_for_delivery', 'paid']) ? '1' : '0' }}"
-                        data-message="{{ $order->status === 'ready_for_delivery' ? '¿Confirmas que está lista para entrega?' : ($order->status === 'paid' ? '¿Confirmas que recibiste el pago?' : '') }}">
-                        @csrf
-                        <button type="submit" class="btn btn-sm {{ $statusClass }}">
-                            {{ $statusLabel }}
-                        </button>
-                    </form>
-                @endif
+    $stepLabels = [
+        'pending' => 'Pendiente',
+        'in_progress' => 'Preparación',
+        'ready_for_delivery' => 'Lista',
+        'paid' => 'Cobro',
+        'completed' => 'Hecha',
+    ];
 
-                @if (!in_array($order->status, ['pending', 'in_progress', 'completed']))
-                    <form action="{{ route('orders.revert', $order) }}" method="POST" class="ml-sm-2 mb-2 mb-sm-0 status-form"
-                        data-confirm="1"
-                        data-message="{{ $order->status === 'ready_for_delivery' ? '¿Seguro que quieres volver a preparación?' : '¿Seguro que quieres volver a listo para entrega?' }}">
-                        @csrf
-                        <button type="submit" class="btn btn-warning btn-sm">Revertir estado</button>
-                    </form>
-                @endif
+    $customerName = trim(($order->user->name ?? '') . ' ' . ($order->user->last_name ?? '')) ?: 'N/D';
+@endphp
+
+<div class="sf-order-detail">
+    <div class="sf-page-head sf-order-detail__head">
+        <div>
+            <a href="{{ route('orders.index') }}" class="sf-back-link">
+                <i class="fas fa-arrow-left"></i> Volver a órdenes
+            </a>
+            <h1>Orden #{{ $order->id }}</h1>
+            <div class="sf-order-detail__meta">
+                <span class="sf-badge {{ $badgeClass }}">{{ $badgeLabel }}</span>
+                <span>{{ $order->fecha }}</span>
+                <span class="sf-dot">·</span>
+                <span>{{ $tipo }}</span>
             </div>
+        </div>
+        <div class="sf-page-actions">
+            <a href="{{ route('orders.report', $order) }}" class="sf-btn-soft">
+                <i class="fas fa-print"></i> Ticket
+            </a>
+            @if (!$cancelled && $statusAction)
+                <form action="{{ route('orders.status', $order) }}" method="POST" class="d-inline status-form"
+                      data-confirm="{{ in_array($order->status, ['ready_for_delivery', 'paid'], true) ? '1' : '0' }}"
+                      data-message="{{ $order->status === 'ready_for_delivery' ? '¿Confirmas que está lista para entrega?' : ($order->status === 'paid' ? '¿Confirmas el cobro y cierre?' : '') }}">
+                    @csrf
+                    <button type="submit" class="{{ $statusAction['class'] }}">{{ $statusAction['label'] }}</button>
+                </form>
+            @endif
+            @if (!$cancelled && !in_array($order->status, ['pending', 'in_progress', 'completed'], true))
+                <form action="{{ route('orders.revert', $order) }}" method="POST" class="d-inline status-form"
+                      data-confirm="1"
+                      data-message="{{ $order->status === 'ready_for_delivery' ? '¿Volver a preparación?' : '¿Volver a listo para entrega?' }}">
+                    @csrf
+                    <button type="submit" class="sf-btn-soft">Revertir</button>
+                </form>
+            @endif
+            @if (auth()->user()->isAdmin())
+                <form action="{{ route('orders.destroy', $order) }}" method="POST" class="d-inline delete-form"
+                      data-message="Se eliminará la orden #{{ $order->id }} permanentemente.">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="sf-btn-soft sf-btn-soft--danger">Eliminar</button>
+                </form>
+            @endif
         </div>
     </div>
 
-    @if (session('msg'))
-        <div class="alert alert-success">{{ session('msg') }}</div>
+    @if (!$cancelled)
+        <div class="sf-card sf-order-detail__timeline-card">
+            <ul class="sf-timeline">
+                @foreach ($flow as $i => $step)
+                    <li class="{{ $stepIndex !== false && $i < $stepIndex ? 'is-done' : '' }} {{ $stepIndex === $i ? 'is-current' : '' }}">
+                        <span>{{ $stepLabels[$step] }}</span>
+                    </li>
+                @endforeach
+            </ul>
+        </div>
     @endif
 
-    <div class="card shadow mb-4">
-        <div class="card-header py-3">
-            <h6 class="m-0 font-weight-bold text-primary">Cliente</h6>
+    <div class="sf-detail-grid">
+        <div class="sf-card sf-order-detail__client">
+            <div class="sf-card__head"><h2>Cliente</h2></div>
+            <div class="sf-card__body">
+                <div class="sf-client">
+                    <div class="sf-client__avatar" aria-hidden="true">
+                        {{ mb_strtoupper(mb_substr($customerName, 0, 1)) }}
+                    </div>
+                    <div>
+                        <strong class="sf-client__name">{{ $customerName }}</strong>
+                        <ul class="sf-client__list">
+                            <li><i class="fas fa-envelope"></i><span>{{ $order->user->email ?? 'N/D' }}</span></li>
+                            <li><i class="fas fa-phone"></i><span>{{ $order->user->phone ?? 'N/D' }}</span></li>
+                            <li>
+                                <i class="fas fa-map-marker-alt"></i>
+                                <span>{{ $order->delivery_address ?: ($order->user->address ?? 'N/D') }}</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                @if ($order->notes)
+                    <div class="sf-client__notes">
+                        <strong>Notas</strong>
+                        <p>{{ $order->notes }}</p>
+                    </div>
+                @endif
+            </div>
         </div>
-        <div class="card-body">
-            <div class="table-responsive">
-                <table class="table text-center w-100">
-                    <thead>
-                        <tr>
-                            <th>Nombre</th>
-                            <th>Apellido</th>
-                            <th>Email</th>
-                            <th>Dirección</th>
-                            <th>Teléfono</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>{{ $order->user->name ?? 'N/D' }}</td>
-                            <td>{{ $order->user->last_name ?? 'N/D' }}</td>
-                            <td>{{ $order->user->email ?? 'N/D' }}</td>
-                            <td>{{ $order->delivery_address ?: ($order->user->address ?? 'N/D') }}</td>
-                            <td>{{ $order->user->phone ?? 'N/D' }}</td>
-                        </tr>
-                    </tbody>
-                </table>
+
+        <div class="sf-card sf-order-detail__products">
+            <div class="sf-card__head">
+                <h2>Productos</h2>
+                <span class="sf-order-detail__count">{{ $order->items->count() }} {{ $order->items->count() === 1 ? 'ítem' : 'ítems' }}</span>
+            </div>
+            <div class="sf-card__body p-0">
+                <div class="sf-item-list">
+                    @forelse ($order->items as $item)
+                        @php $qty = (int) ($item->pivot->qty ?? $item->qty ?? 1); @endphp
+                        <div class="sf-item-row">
+                            <img class="sf-thumb" src="{{ asset($item->image ?: 'images/no-image.jpg') }}" alt="{{ $item->name }}">
+                            <div class="sf-item-row__info">
+                                <strong>{{ $item->name }}</strong>
+                                <span>${{ number_format((float) $item->price, 2) }} c/u</span>
+                            </div>
+                            <span class="sf-qty">×{{ $qty }}</span>
+                            <strong class="sf-item-row__sub">${{ number_format((float) $item->price * $qty, 2) }}</strong>
+                        </div>
+                    @empty
+                        <div class="sf-empty">Sin productos</div>
+                    @endforelse
+                </div>
+            </div>
+            <div class="sf-order-detail__total">
+                <span>Total</span>
+                <strong>${{ number_format((float) $order->total, 2) }}</strong>
             </div>
         </div>
     </div>
-
-    <div class="card shadow mb-4">
-        <div class="card-header py-3">
-            <h6 class="m-0 font-weight-bold text-primary">Detalles de la orden</h6>
-        </div>
-        <div class="card-body">
-            <div class="table-responsive">
-                <table class="table text-center w-100">
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>Imagen</th>
-                            <th>Nombre</th>
-                            <th>Precio</th>
-                            <th>Cantidad</th>
-                            <th>Subtotal</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @forelse ($order->items as $item)
-                            @php $qty = $item->pivot->qty ?? $item->qty ?? 1; @endphp
-                            <tr>
-                                <td>{{ $item->id }}</td>
-                                <td>
-                                    <img src="{{ asset($item->image ?: 'images/no-image.jpg') }}" width="50"
-                                        alt="{{ $item->name }}">
-                                </td>
-                                <td>{{ $item->name }}</td>
-                                <td>${{ number_format($item->price, 2) }}</td>
-                                <td><span class="badge badge-pill badge-primary">{{ $qty }}</span></td>
-                                <td>${{ number_format($item->price * $qty, 2) }}</td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="6">Sin productos</td>
-                            </tr>
-                        @endforelse
-                        <tr>
-                            <td colspan="4"></td>
-                            <td><strong>Total:</strong></td>
-                            <td><strong>${{ number_format($order->total, 2) }}</strong></td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-
-    <div class="card shadow mb-4">
-        <div class="card-header py-3">
-            <h6 class="m-0 font-weight-bold text-primary">Especificación del cliente</h6>
-        </div>
-        <div class="card-body text-center">
-            <p>{{ $order->notes ?: 'Sin notas' }}</p>
-        </div>
-    </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script>
-        document.querySelectorAll('.status-form').forEach((form) => {
-            form.addEventListener('submit', function (event) {
-                if (form.dataset.confirm !== '1') {
-                    return;
-                }
-
-                event.preventDefault();
-                Swal.fire({
-                    title: 'Confirmación',
-                    text: form.dataset.message || '¿Confirmas esta acción?',
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonText: 'Sí, confirmar',
-                    cancelButtonText: 'Cancelar',
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        form.submit();
-                    }
-                });
-            });
-        });
-    </script>
+</div>
 @endsection

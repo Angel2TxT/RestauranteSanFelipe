@@ -1,71 +1,52 @@
 @extends('layouts.admin')
 
+@section('title', 'Editar deslizador')
+@section('page_title', 'Editar deslizador')
+
 @section('content')
-<div class="row col-md-8 offset-md-2">
-    <div class="card shadow">
-        <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-            <h3 class="m-0 font-weight-bold text-primary"> Editar</h3>
-            <a href="{{route('sliders.index')}}" class="btn btn-primary">Volver</a>
-        </div>
-        <div class="card-body">
-
-            <x-errors />
-
-            <form method="POST" action="{{route('sliders.update',$slider->id)}}" class="form-row" enctype="multipart/form-data">
-
-                @csrf
-                @method('PATCH')
-
-                <div class="form-group col-md-6">
-                    <label for="title">Titulo</label>
-                    <input class="form-control" id="title" type="text" value="{{$slider->title}}" name="title">
-
-                </div>
-
-                <div class="form-group col-md-6">
-
-                    <label for="description">Descripcion</label>
-                    <input class="form-control" id="description" type="text" value="{{$slider->description}}" name="description">
-
-                </div>
-
-
-                <div class="form-group col-md-6">
-                    <label for="link">Nombre del Producto</label>
-                    <input class="form-control" id="link" type="text" value="{{$slider->link}}" name="link">
-
-                </div>
-
-                <div class="form-group col-md-6">
-
-                    <label for="text_link">Comprar</label>
-                    <input class="form-control" id="text_link" type="text" value="{{$slider->text_link}}" name="text_link">
-
-                </div>
-
-                <div class="col-6">
-                    <img src="{{asset($slider->image)}}" width="180">
-                </div>
-
-                <div class="col-6">
-                    <div class="form-wrap">
-                        <label for="image">Imagen</label>
-                        <input type="file" class="form-control-file" name="image" id="image">
-                    </div>
-                </div>
-
-
-                <button type="submit" class="btn btn-primary mt-4 float-right">
-                    Editar
-                </button>
-
-            </form>
-       
-
-        </div>
-
-
+<div class="sf-page-head">
+    <div>
+        <h1>Editar deslizador</h1>
+        <p>{{ $slider->title }}</p>
+    </div>
+    <div class="sf-page-actions">
+        <a href="{{ route('sliders.index') }}" class="btn btn-outline-secondary">Volver</a>
     </div>
 </div>
 
+<div class="sf-card" style="max-width: 860px;">
+    <div class="sf-card__body">
+        <x-errors />
+        <form method="POST" action="{{ route('sliders.update', $slider) }}" class="form-row" enctype="multipart/form-data">
+            @csrf
+            @method('PATCH')
+            <div class="form-group col-md-6">
+                <label for="title">Título</label>
+                <input class="form-control" id="title" type="text" value="{{ old('title', $slider->title) }}" name="title">
+            </div>
+            <div class="form-group col-md-6">
+                <label for="description">Descripción</label>
+                <input class="form-control" id="description" type="text" value="{{ old('description', $slider->description) }}" name="description">
+            </div>
+            <div class="form-group col-md-6">
+                <label for="link">Nombre del producto</label>
+                <input class="form-control" id="link" type="text" value="{{ old('link', $slider->link) }}" name="link">
+            </div>
+            <div class="form-group col-md-6">
+                <label for="text_link">Texto del botón</label>
+                <input class="form-control" id="text_link" type="text" value="{{ old('text_link', $slider->text_link) }}" name="text_link">
+            </div>
+            <div class="col-md-6 text-center mb-3">
+                <img class="sf-thumb" style="width:160px;height:160px;" src="{{ asset($slider->image ?: 'images/no-image.jpg') }}" alt="">
+            </div>
+            <div class="form-group col-md-6">
+                <label for="image">Cambiar imagen</label>
+                <input type="file" class="form-control-file" name="image" id="image">
+            </div>
+            <div class="col-12 text-right">
+                <button type="submit" class="btn btn-primary">Guardar</button>
+            </div>
+        </form>
+    </div>
+</div>
 @endsection

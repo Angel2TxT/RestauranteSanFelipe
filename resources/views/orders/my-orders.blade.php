@@ -3,11 +3,13 @@
 @section('content')
 @php
   $statusMeta = [
-    'pending' => ['label' => 'Pendiente', 'hint' => 'Recibimos tu pedido', 'class' => 'is-pending'],
+    'pending' => ['label' => 'Pendiente', 'hint' => 'Aún puedes editar o cancelar', 'class' => 'is-pending'],
     'in_progress' => ['label' => 'En preparación', 'hint' => 'Estamos cocinando', 'class' => 'is-progress'],
     'ready_for_delivery' => ['label' => 'Lista', 'hint' => 'Tu orden está lista', 'class' => 'is-ready'],
     'paid' => ['label' => 'Por pagar', 'hint' => 'Procede a pagar', 'class' => 'is-paid'],
     'completed' => ['label' => 'Completada', 'hint' => 'Pedido finalizado', 'class' => 'is-done'],
+    'cancelled_by_user' => ['label' => 'Cancelada', 'hint' => 'Cancelaste este pedido', 'class' => 'is-cancelled'],
+    'cancelled_by_store' => ['label' => 'Cancelada', 'hint' => 'El restaurante canceló el pedido', 'class' => 'is-cancelled'],
   ];
 
   $orderTypeLabel = [
@@ -88,13 +90,37 @@
               <div class="order-card__items">
                 @foreach ($order->items as $item)
                   @php $qty = (int) ($item->pivot->qty ?? 1); @endphp
-                  <div class="order-item">
+                  <div class="order-item" data-order-item="{{ $item->id }}">
                     <img src="{{ asset($item->image ?: 'images/no-image.jpg') }}" alt="{{ $item->name }}" width="48" height="48">
                     <div class="order-item__info">
                       <strong>{{ $item->name }}</strong>
-                      <span>x{{ $qty }} · ${{ number_format((float) $item->price, 2) }}</span>
+                      <span class="order-item__price-line">x<span class="js-order-qty-label">{{ $qty }}</span> · ${{ number_format((float) $item->price, 2) }}</span>
+                      @if ($order->status === 'pending')
+                        <div class="order-item__controls">
+                          <div class="cart-qty order-qty">
+                            <button type="button" class="cart-qty-btn js-order-qty-step" data-step="-1" aria-label="Menos">−</button>
+                            <input
+                              type="number"
+                              class="cart-qty-input js-order-qty"
+                              min="1"
+                              max="50"
+                              value="{{ $qty }}"
+                              data-url="{{ route('orders.items.update', [$order, $item]) }}"
+                            >
+                            <button type="button" class="cart-qty-btn js-order-qty-step" data-step="1" aria-label="Más">+</button>
+                          </div>
+                          <button
+                            type="button"
+                            class="order-item__remove js-order-item-remove"
+                            data-url="{{ route('orders.items.remove', [$order, $item]) }}"
+                            aria-label="Quitar {{ $item->name }}"
+                          >
+                            <i class="fas fa-trash-alt"></i>
+                          </button>
+                        </div>
+                      @endif
                     </div>
-                    <span class="order-item__sub">${{ number_format((float) $item->price * $qty, 2) }}</span>
+                    <span class="order-item__sub js-order-item-sub">${{ number_format((float) $item->price * $qty, 2) }}</span>
                   </div>
                 @endforeach
               </div>
@@ -108,12 +134,32 @@
 
               <footer class="order-card__foot">
                 <span class="order-card__hint">{{ $meta['hint'] }}</span>
-                <div class="order-card__steps" aria-hidden="true">
-                  @foreach ($flow as $i => $step)
-                    <span class="order-step {{ $i <= $stepIndex ? 'is-on' : '' }}"></span>
-                  @endforeach
-                </div>
+                @if (!in_array($order->status, ['cancelled_by_user', 'cancelled_by_store'], true))
+                  <div class="order-card__steps" aria-hidden="true">
+                    @foreach ($flow as $i => $step)
+                      <span class="order-step {{ $i <= $stepIndex ? 'is-on' : '' }}"></span>
+                    @endforeach
+                  </div>
+                @endif
               </footer>
+
+              @if ($order->status === 'pending')
+                <div class="order-card__actions">
+                  <a class="order-card__btn order-card__btn--primary" href="{{ route('orders.edit.shop', $order) }}">
+                    Agregar productos
+                  </a>
+                  <form action="{{ route('orders.cancel', $order) }}" method="POST" class="js-order-cancel-form">
+                    @csrf
+                    <button type="submit" class="order-card__btn order-card__btn--danger">Cancelar pedido</button>
+                  </form>
+                </div>
+              @elseif ($order->status === 'completed')
+                <div class="order-card__actions">
+                  <a class="order-card__btn order-card__btn--primary" href="{{ route('orders.ticket', $order) }}" target="_blank" rel="noopener">
+                    Descargar ticket
+                  </a>
+                </div>
+              @endif
             </article>
           @endforeach
         </div>

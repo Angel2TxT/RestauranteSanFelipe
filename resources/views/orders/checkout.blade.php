@@ -2,9 +2,9 @@
 
 @section('content')
 @php
-  $cart = Cart::instance('shopping');
-  $cartCount = $cart->count();
-  $cartTotal = $cart->priceTotal();
+  $summary = $summary ?? \App\Services\CartPricing::summarize();
+  $cartCount = $summary['qty_total'];
+  $cartTotal = number_format($summary['total'], 2);
   $selectedType = old('order_type', 'dine_in');
 @endphp
 

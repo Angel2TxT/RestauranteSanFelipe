@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Slider;
 use App\Models\Product;
 use App\Models\Category;
+use App\Models\Order;
 use Illuminate\Http\Request;
 
 class HomeController extends Controller
@@ -27,6 +28,29 @@ class HomeController extends Controller
             ? $request->input('sort')
             : null;
 
+        $editingOrder = null;
+        if (auth()->check() && $request->filled('order')) {
+            $editingOrder = Order::query()
+                ->where('id', $request->integer('order'))
+                ->where('user_id', auth()->id())
+                ->where('status', 'pending')
+                ->first();
+
+            if ($editingOrder) {
+                session(['editing_order_id' => $editingOrder->id]);
+            }
+        } elseif (auth()->check() && session('editing_order_id')) {
+            $editingOrder = Order::query()
+                ->where('id', session('editing_order_id'))
+                ->where('user_id', auth()->id())
+                ->where('status', 'pending')
+                ->first();
+
+            if (!$editingOrder) {
+                session()->forget('editing_order_id');
+            }
+        }
+
         $categories = Category::orderBy('name')->get();
 
         $products = Product::with('category')
@@ -41,6 +65,6 @@ class HomeController extends Controller
             return view('shop._products', compact('products'));
         }
 
-        return view('shop', compact('products', 'categories'));
+        return view('shop', compact('products', 'categories', 'editingOrder'));
     }
 }

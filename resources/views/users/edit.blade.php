@@ -1,90 +1,73 @@
 @extends('layouts.admin')
 
+@section('title', 'Editar usuario')
+@section('page_title', 'Editar usuario')
+
 @section('content')
-    <div class="row col-md-8 offset-md-2">
-        <div class="card shadow">
-            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                <h3 class="m-0 font-weight-bold text-primary"> Editar Usuario</h3>
-                <a href="{{ route('users.index') }}" class="btn btn-primary">Volver</a>
-            </div>
-            <div class="card-body">
-                <x-errors />
-                <form method="POST" action="{{ route('users.update', $user->id) }}" class="form-row"
-                    enctype="multipart/form-data">
-                    @csrf
-                    @method('PATCH')
-
-                    <div class="form-group col-md-6">
-                        <label for="name">Nombre*</label>
-                        <input class="form-control" id="name" type="name" value="{{ $user->name }}"
-                            name="name">
-                    </div>
-
-                    <div class="form-group col-md-6">
-                        <label for="last_name">Apellido</label>
-                        <input class="form-control" id="last_name" type="text" value="{{ $user->last_name }}"
-                            name="last_name">
-                    </div>
-
-                    <div class="form-group col-md-6">
-                        <label for="email">Email*</label>
-                        <input class="form-control" id="email" type="email" value="{{ $user->email }}"
-                            name="email">
-                    </div>
-                    <div class="form-group col-md-6">
-                        <label for="address">Direccion</label>
-                        <input class="form-control" id="address" type="text" value="{{ $user->address }}"
-                            name="address">
-                    </div>
-
-                    <div class="form-group col-md-6">
-                        <label for="password">Contraseña*</label>
-                        <input class="form-control" id="password" type="password" name="password">
-                    </div>
-
-                    <div class="form-group col-md-6">
-                        <label for="password_confirmation">Confirmar contraseña*</label>
-                        <input class="form-control" id="password_confirmation" type="password" name="password_confirmation">
-                    </div>
-                    <div class="form-group col-md-6">
-
-                        <label for="phone">Numero</label>
-                        <input class="form-control" id="phone" type="text" value="{{ $user->phone }}"
-                            name="phone">
-
-                    </div>
-                    <div class="form-group col-md-6">
-                        <div class="form-check" style="margin-top: 2rem">
-                            <label for="role" class="form-label">Tipo de Usuario</label>
-                            <select name="role" id="role" class="form-control">
-                                <option value="0" {{ $user->role == 0 ? 'selected' : '' }}>Cliente</option>
-                                <option value="1" {{ $user->role == 1 ? 'selected' : '' }}>Administrador</option>
-                                <option value="2" {{ $user->role == 2 ? 'selected' : '' }}>Empleado</option>
-                                <option value="3" {{ $user->role == 3 ? 'selected' : '' }}>Repartidor</option>
-                            </select>
-                            
-                            
-                        </div>
-                    </div>
-
-                    <div class="col-6 text-center">
-                        <img src="{{ asset($user->image ?: 'images/no-image.jpg') }}" width="100" alt="Avatar">
-                    </div>
-
-                    <div class="col-6">
-                        <div class="form-wrap">
-                            <label for="image">Imagen</label>
-                            <input type="file" class="form-control-file" name="image" id="image">
-                        </div>
-                    </div>
-
-                    <button type="submit" class="btn btn-primary mt-4 float-right">
-                        Edit
-                    </button>
-
-                </form>
-
-            </div>
-        </div>
+<div class="sf-page-head">
+    <div>
+        <h1>Editar usuario</h1>
+        <p>{{ $user->name }}</p>
     </div>
+    <div class="sf-page-actions">
+        <a href="{{ route('users.index') }}" class="btn btn-outline-secondary">Volver</a>
+    </div>
+</div>
+
+<div class="sf-card" style="max-width: 860px;">
+    <div class="sf-card__body">
+        <x-errors />
+        <form method="POST" action="{{ route('users.update', $user) }}" class="form-row" enctype="multipart/form-data">
+            @csrf
+            @method('PATCH')
+            <div class="form-group col-md-6">
+                <label for="name">Nombre*</label>
+                <input class="form-control" id="name" type="text" value="{{ old('name', $user->name) }}" name="name">
+            </div>
+            <div class="form-group col-md-6">
+                <label for="last_name">Apellido</label>
+                <input class="form-control" id="last_name" type="text" value="{{ old('last_name', $user->last_name) }}" name="last_name">
+            </div>
+            <div class="form-group col-md-6">
+                <label for="email">Correo*</label>
+                <input class="form-control" id="email" type="email" value="{{ old('email', $user->email) }}" name="email">
+            </div>
+            <div class="form-group col-md-6">
+                <label for="address">Dirección</label>
+                <input class="form-control" id="address" type="text" value="{{ old('address', $user->address) }}" name="address">
+            </div>
+            <div class="form-group col-md-6">
+                <label for="password">Nueva contraseña (opcional)</label>
+                <input class="form-control" id="password" type="password" name="password" autocomplete="new-password">
+            </div>
+            <div class="form-group col-md-6">
+                <label for="password_confirmation">Confirmar contraseña</label>
+                <input class="form-control" id="password_confirmation" type="password" name="password_confirmation" autocomplete="new-password">
+            </div>
+            <div class="form-group col-md-6">
+                <label for="phone">Teléfono</label>
+                <input class="form-control" id="phone" type="text" value="{{ old('phone', $user->phone) }}" name="phone">
+            </div>
+            <div class="form-group col-md-6">
+                <label for="role">Rol</label>
+                <select name="role" id="role" class="form-control">
+                    <option value="0" @selected(old('role', $user->role) == 0)>Cliente</option>
+                    <option value="1" @selected(old('role', $user->role) == 1)>Administrador</option>
+                    <option value="2" @selected(old('role', $user->role) == 2)>Empleado</option>
+                    <option value="3" @selected(old('role', $user->role) == 3)>Repartidor</option>
+                </select>
+            </div>
+            <div class="col-md-6 text-center mb-3">
+                <img class="sf-thumb" style="width:100px;height:100px;" src="{{ asset($user->image ?: 'images/no-image.jpg') }}" alt="">
+            </div>
+            <div class="form-group col-md-6">
+                <label for="image">Foto</label>
+                <input type="file" class="form-control-file" name="image" id="image">
+            </div>
+            <div class="col-12 text-right">
+                <button type="submit" class="btn btn-primary">Guardar</button>
+            </div>
+        </form>
+    </div>
+</div>
 @endsection

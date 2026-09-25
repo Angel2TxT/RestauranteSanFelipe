@@ -33,7 +33,24 @@
 
   <div class="shop-body">
     <div class="container">
+      @if (!empty($editingOrder))
+        <div class="shop-editing-banner">
+          <div>
+            <strong>Editando orden #{{ $editingOrder->id }}</strong>
+            <span>Agrega platillos al carrito y luego pulsa “Agregar a orden”.</span>
+            <a href="{{ route('orders.my') }}" class="shop-editing-banner__link">Volver a mis órdenes</a>
+          </div>
+          <form action="{{ route('orders.edit.stop') }}" method="POST">
+            @csrf
+            <button type="submit" class="shop-editing-banner__btn">Salir de edición</button>
+          </form>
+        </div>
+      @endif
+
       <form method="GET" action="{{ route('shop') }}" id="shop-form" class="shop-filters-box" data-ajax-shop>
+        @if (!empty($editingOrder))
+          <input type="hidden" name="order" value="{{ $editingOrder->id }}">
+        @endif
         <div class="shop-filters-row">
           <div class="shop-filters-item shop-filters-item--sort">
             <label class="shop-filters-label" for="shop-sort">Ordenar</label>

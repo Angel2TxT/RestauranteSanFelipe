@@ -24,7 +24,25 @@
         <!-- Page Header-->
         @include('layouts.partials.header')
 
-        <div id="ajax-toast" class="ajax-toast" hidden></div>
+        <div id="ajax-toast" class="ajax-toast" hidden aria-live="polite">
+            <span class="ajax-toast__icon" aria-hidden="true"></span>
+            <span class="ajax-toast__msg"></span>
+        </div>
+
+        <div id="sf-confirm" class="sf-confirm" hidden>
+            <div class="sf-confirm__backdrop" data-sf-confirm-dismiss></div>
+            <div class="sf-confirm__dialog" role="alertdialog" aria-modal="true" aria-labelledby="sf-confirm-title" aria-describedby="sf-confirm-text">
+                <div class="sf-confirm__icon" aria-hidden="true">
+                    <i class="fas fa-exclamation"></i>
+                </div>
+                <h3 class="sf-confirm__title" id="sf-confirm-title">¿Continuar?</h3>
+                <p class="sf-confirm__text" id="sf-confirm-text"></p>
+                <div class="sf-confirm__actions">
+                    <button type="button" class="sf-confirm__btn sf-confirm__btn--ghost" data-sf-confirm-dismiss>No, volver</button>
+                    <button type="button" class="sf-confirm__btn sf-confirm__btn--danger" id="sf-confirm-ok">Sí, confirmar</button>
+                </div>
+            </div>
+        </div>
 
         @if (session()->has('msg'))
             <div class="alert alert-success alert-dismissible fade show mt-4" role="alert" style="background-color: green; color:white">

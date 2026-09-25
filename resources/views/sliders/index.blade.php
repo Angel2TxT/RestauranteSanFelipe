@@ -1,84 +1,71 @@
 @extends('layouts.admin')
 
+@section('title', 'Deslizadores')
+@section('page_title', 'Deslizadores')
+
 @section('content')
-    <!-- Begin Page Content -->
-    <div class="container-fluid">
+<div class="sf-page-head">
+    <div>
+        <h1>Deslizadores</h1>
+        <p>Banners del inicio</p>
+    </div>
+    <div class="sf-page-actions">
+        <a href="{{ route('sliders.create') }}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Crear deslizador
+        </a>
+    </div>
+</div>
 
-        <div class="card shadow">
-            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                <h3 class="m-0 font-weight-bold text-primary"> Deslizadores</h3>
-                <a href="{{route('sliders.create')}}" class="btn btn-primary">Crear</a>
-
-            </div>
-            <div class="card-body">
-                <div class="table-responsive"> 
-                <table class="table text-center">
-                    <thead>
+<div class="sf-card">
+    <div class="sf-card__body p-0">
+        <div class="table-responsive">
+            <table class="table sf-table text-center mb-0">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Imagen</th>
+                        <th>Título</th>
+                        <th>Descripción</th>
+                        <th>Producto</th>
+                        <th>Botón</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse ($sliders as $slider)
                         <tr>
-                            <th scope="col">#</th>
-                            <th scope="col">Imagen</th>
-                            <th scope="col">Titulo</th>
-                            <th scope="col">Descripcion</th>
-                            <th scope="col">Nombre del producto</th>
-                            <th scope="col">Boton de comprar</th>
-                            <th scope="col">...</th>
-                            <th scope="col">...</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @forelse ($sliders as $slider)
-                        <tr>
-                            <th scope="row">{{$slider->id}}</th>
+                            <td>{{ $slider->id }}</td>
                             <td>
-                                <img src="{{asset($slider->image)}}" width="80">
-
+                                <img class="sf-thumb" src="{{ asset($slider->image ?: 'images/no-image.jpg') }}" alt="{{ $slider->title }}">
                             </td>
-                            <td>{{$slider->title}}</td>
-                            <td>{{$slider->description}}</td>
-                            <td>{{$slider->link}}</td>
-                            <td>{{$slider->text_link}}</td>
-
+                            <td class="font-weight-bold">{{ $slider->title }}</td>
+                            <td class="text-left">{{ \Illuminate\Support\Str::limit($slider->description, 50) }}</td>
+                            <td>{{ $slider->link }}</td>
+                            <td>{{ $slider->text_link }}</td>
                             <td>
-                                <a class="btn btn-primary btn-sm" href="{{route('sliders.edit',$slider->id)}}">
-                                    <span class="fas fa-edit"></span>
+                                <a class="btn btn-primary btn-sm" href="{{ route('sliders.edit', $slider) }}">
+                                    <i class="fas fa-edit"></i>
                                 </a>
-                            </td>
-                            <td>
-
-                                <form action="{{route('sliders.destroy',$slider->id)}}" method="POST" class="confirm-form mb-0">
+                                <form action="{{ route('sliders.destroy', $slider) }}" method="POST" class="d-inline delete-form">
                                     @csrf
                                     @method('DELETE')
-
                                     <button type="submit" class="btn btn-danger btn-sm">
-                                        <span class="fas fa-trash"></span>
+                                        <i class="fas fa-trash"></i>
                                     </button>
-
                                 </form>
                             </td>
                         </tr>
- 
-                        @empty
-
+                    @empty
                         <tr>
-                            <td colspan="10">Sin registros</td>
+                            <td colspan="7" class="sf-empty">Sin deslizadores</td>
                         </tr>
-                            
-                        @endforelse
-
-
-                    </tbody>
-                </table>
-                </div>
-            </div>
-            <div class="card-footer">
-
-                {{$sliders->links()}}
-
-
-            </div>
+                    @endforelse
+                </tbody>
+            </table>
         </div>
-
-
     </div>
-    <!-- /.container-fluid -->
+    @if ($sliders->hasPages())
+        <div class="sf-card__foot">{{ $sliders->links() }}</div>
+    @endif
+</div>
 @endsection

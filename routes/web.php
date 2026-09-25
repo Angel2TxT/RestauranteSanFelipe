@@ -31,6 +31,14 @@ Route::middleware('auth')->group(function () {
     Route::post('order/proccess-checkout', [OrderController::class, 'proccesCheckout'])->name('orders.proccess.checkout');
     Route::get('my-orders', [OrderController::class, 'myOrders'])->name('orders.my');
 
+    Route::get('my-orders/{order}/edit-shop', [OrderController::class, 'startEditing'])->name('orders.edit.shop');
+    Route::post('my-orders/stop-editing', [OrderController::class, 'stopEditing'])->name('orders.edit.stop');
+    Route::post('my-orders/{order}/items', [OrderController::class, 'mergeCartItems'])->name('orders.items.merge');
+    Route::patch('my-orders/{order}/items/{item}', [OrderController::class, 'updateItem'])->name('orders.items.update');
+    Route::delete('my-orders/{order}/items/{item}', [OrderController::class, 'removeItem'])->name('orders.items.remove');
+    Route::post('my-orders/{order}/cancel', [OrderController::class, 'cancel'])->name('orders.cancel');
+    Route::get('my-orders/{order}/ticket', [OrderController::class, 'ticket'])->name('orders.ticket');
+
     Route::get('notifications', [NotificationController::class, 'index'])->name('notifications.index');
     Route::post('notifications/read-all', [NotificationController::class, 'markAllAsRead'])->name('notifications.read-all');
     Route::post('notifications/{id}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');
@@ -38,6 +46,12 @@ Route::middleware('auth')->group(function () {
 
 Route::prefix('admin')->middleware(['auth', BlockAccessMiddleware::class])->group(function () {
     Route::get('home', [App\Http\Controllers\AdminController::class, 'index'])->name('admin.home');
+    Route::get('kitchen', [App\Http\Controllers\KitchenController::class, 'index'])->name('kitchen.index');
+    Route::get('kitchen/feed', [App\Http\Controllers\KitchenController::class, 'feed'])->name('kitchen.feed');
+    Route::get('cashier', [App\Http\Controllers\CashierController::class, 'index'])->name('cashier.index');
+    Route::get('cashier/feed', [App\Http\Controllers\CashierController::class, 'feed'])->name('cashier.feed');
+    Route::post('cashier/orders/{order}/preview-change', [App\Http\Controllers\CashierController::class, 'previewChange'])->name('cashier.preview');
+    Route::post('cashier/orders/{order}/charge', [App\Http\Controllers\CashierController::class, 'charge'])->name('cashier.charge');
 
     Route::resource('orders', OrderController::class)->except(['create', 'store', 'edit', 'update']);
     Route::resource('sliders', SliderController::class)->except(['show']);

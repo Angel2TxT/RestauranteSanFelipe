@@ -25,7 +25,7 @@ class BlockAccessMiddleware
         }
 
         if (in_array($role, [2, 3], true)) {
-            $allowedPrefixes = ['orders.', 'profile.', 'admin.home'];
+            $allowedPrefixes = ['orders.', 'profile.', 'admin.home', 'kitchen.', 'cashier.'];
             $allowed = collect($allowedPrefixes)->contains(
                 fn ($prefix) => $routeName && str_starts_with($routeName, $prefix)
             );
