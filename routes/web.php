@@ -22,6 +22,14 @@ Route::get('/shop', [App\Http\Controllers\HomeController::class, 'shop'])->name(
 Route::get('products/display/{product}', [ProductController::class, 'display'])->name('products.display');
 Route::get('categories/display/{category}', [CategoryController::class, 'show'])->name('categories.display');
 
+Route::get('cart/checkout-guest', function (\Illuminate\Http\Request $request) {
+    session()->put('url.intended', route('orders.checkout'));
+    if ($request->query('action') === 'register') {
+        return redirect()->route('register');
+    }
+    return redirect()->route('login');
+})->name('cart.checkout.guest');
+
 Route::get('cart/{product}', [CartController::class, 'add'])->name('cart.add');
 Route::patch('cart/update/{rowId}', [CartController::class, 'update'])->name('cart.update');
 Route::get('cart/remove/{rowId}', [CartController::class, 'remove'])->name('cart.remove');

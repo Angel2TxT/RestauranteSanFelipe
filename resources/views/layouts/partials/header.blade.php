@@ -77,15 +77,15 @@
               </div>
             </div>
           </div>
-
-          <button type="button" class="sf-btn sf-btn--cart" id="sf-cart-open" aria-label="Abrir carrito">
-            <i class="fas fa-shopping-bag"></i>
-            @php $cartBadge = \App\Services\CartPricing::summarize()['items_count']; @endphp
-            <span id="cart-count" class="sf-cart-badge{{ $cartBadge ? '' : ' is-empty' }}">
-              {{ $cartBadge }}
-            </span>
-          </button>
         @endauth
+
+        <button type="button" class="sf-btn sf-btn--cart" id="sf-cart-open" aria-label="Abrir carrito">
+          <i class="fas fa-shopping-bag"></i>
+          @php $cartBadge = \App\Services\CartPricing::summarize()['items_count']; @endphp
+          <span id="cart-count" class="sf-cart-badge{{ $cartBadge ? '' : ' is-empty' }}">
+            {{ $cartBadge }}
+          </span>
+        </button>
       </div>
     </div>
   </div>
