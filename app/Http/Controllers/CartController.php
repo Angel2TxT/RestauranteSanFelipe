@@ -42,6 +42,11 @@ class CartController extends Controller
         Cart::instance('shopping')->remove($rowId);
         CartPricing::syncFromDatabase();
 
+        $summary = CartPricing::summarize();
+        if ($summary['items_count'] === 0 && session('url.intended') && str_contains(session('url.intended'), 'checkout')) {
+            session()->forget('url.intended');
+        }
+
         return $this->cartResponse($request, 'Producto eliminado del carrito');
     }
 
